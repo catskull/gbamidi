@@ -1,0 +1,1 @@
+void gbaSendRom(unsigned char *pgmSpaceStart, int length);
