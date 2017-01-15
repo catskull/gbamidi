@@ -4,13 +4,11 @@
 # is public domain), believed to be neutral to any flavor of "make"
 # (GNU make, BSD make, SysV make)
 
-MCU = atmega168
-BOOTLOADER_ADDRESS=0x3800
-FUSEOPT= -U lock:w:0x2f:m -U hfuse:w:0xdF:m -U lfuse:w:0xFf:m -U efuse:w:0x00:m
+MCU = atmega328
 
 FORMAT = ihex
 TARGET = gbamidi
-SRC = main.c gbaserial.c gbaencrypt.c gbacrc.c midi.c gbasendrom.c
+SRC = gbaserial.c main.c gbaencrypt.c gbacrc.c midi.c gbasendrom.c gbarom.o
 DEPS=
 ASRC = 
 OPT = s
@@ -43,7 +41,7 @@ CINCS =
 CDEBUG = -g$(DEBUG)
 CWARN = -Wall -Wstrict-prototypes
 CTUNING = \
-   -ffreestanding -mcall-prologues      --combine  -fwhole-program  \
+   -mcall-prologues \
 -finline-limit=2 -fno-inline-small-functions 
 
 
@@ -88,7 +86,7 @@ SCANF_LIB =
 EXTMEMOPTS =
 
 #LDMAP = $(LDFLAGS) -Wl,-Map=$(TARGET).map,--cref
-LDFLAGS = $(EXTMEMOPTS) $(LDMAP) $(PRINTF_LIB) $(SCANF_LIB) $(MATH_LIB) -Wl,--section-start=.text=$(BOOTLOADER_ADDRESS) $(LD_EXTRA_FLAGS)
+LDFLAGS = $(EXTMEMOPTS) $(LDMAP) $(PRINTF_LIB) $(SCANF_LIB) $(MATH_LIB)  $(LD_EXTRA_FLAGS)
 
 
 # Programming support using avrdude. Settings and variables.
@@ -116,7 +114,7 @@ AVRDUDE_WRITE_FLASH = -U flash:w:$(TARGET).hex
 # to submit bug reports.
 #AVRDUDE_VERBOSE = -v -v
 
-AVRDUDE_BASIC = -p $(MCU) -P $(AVRDUDE_PORT) -c $(AVRDUDE_PROGRAMMER) 
+AVRDUDE_BASIC = -p $(MCU) -c $(AVRDUDE_PROGRAMMER) 
 AVRDUDE_FLAGS = $(AVRDUDE_BASIC) $(AVRDUDE_NO_VERIFY) $(AVRDUDE_VERBOSE) $(AVRDUDE_ERASE_COUNTER) -E noreset,vcc
 
 
@@ -140,8 +138,16 @@ LST = $(ASRC:.S=.lst) $(SRC:.c=.lst)
 ALL_CFLAGS = -mmcu=$(MCU) -I. $(CFLAGS)
 ALL_ASFLAGS = -mmcu=$(MCU) -I. -x assembler-with-cpp $(ASFLAGS)
 
-
 # Default target.
+gbamidimk2.mid: gbafw2mid/gbafw2mid gbamidi.bin
+	gbafw2mid/gbafw2mid gbamidi.mid < gbamidi.bin > /dev/null
+
+gbafw2mid/gbafw2mid: gbafw2mid/
+	make -C gbafw2mid
+
+gbamidi.bin: gbamidi.elf
+	avr-objcopy -O binary gbamidi.elf gbamidi.bin
+
 all: build
 
 build: elf hex eep
@@ -157,8 +163,8 @@ sym: $(TARGET).sym
 #Yes, the copy is needed because objcopy uses the name of the binary in the name for the variables.
 gbarom.o: $(GBAROM) update-$(GBAROM)
 	cp $(GBAROM) gbarom.bin
-#	avr-objcopy --input binary --output elf32-avr --binary-architecture avr --rename-section .data=.progmem.data gbarom.bin gbarom.o
-	avr-objcopy --input binary --output elf32-avr --binary-architecture avr --rename-section .data=.rel.text gbarom.bin gbarom.o
+	avr-objcopy --input binary --output elf32-avr --binary-architecture avr --rename-section .data=.progmem.data gbarom.bin gbarom.o
+#	avr-objcopy --input binary --output elf32-avr --binary-architecture avr --rename-section .data=.rel.text gbarom.bin gbarom.o
 	rm gbarom.bin
 
 update-$(GBAROM): gbacode
@@ -167,14 +173,7 @@ update-$(GBAROM): gbacode
 
 # Program the device.  
 program: $(TARGET).hex $(TARGET).eep
-	$(AVRDUDE) $(AVRDUDE_FLAGS) $(AVRDUDE_WRITE_FLASH) $(AVRDUDE_WRITE_EEPROM) $(FUSEOPT)
-#Doesn't work anymore because of checksum.
-#	avr-objcopy --input binary --output ihex $(GBAROM) gbarom.hex
-#	$(AVRDUDE) $(AVRDUDE_FLAGS) -D -U flash:w:gbarom.hex
-
-fw.h: firmware.bin
-	bin2c fw < firmware.bin  > fw.h
-
+	$(AVRDUDE) $(AVRDUDE_FLAGS) $(AVRDUDE_WRITE_FLASH) $(AVRDUDE_WRITE_EEPROM)
 
 # Convert ELF to COFF for use in debugging / simulating in AVR Studio or VMLAB.
 COFFCONVERT=$(OBJCOPY) --debugging \
@@ -210,8 +209,8 @@ extcoff: $(TARGET).elf
 	$(NM) -n $< > $@
 
 
-$(TARGET).elf: $(SRC)
-	$(CC) $(ALL_CFLAGS) $(SRC) $(LDFLAGS) -o $@
+$(TARGET).elf: $(OBJ)
+	$(CC) $(ALL_CFLAGS) $(OBJ) $(LDFLAGS) -o $@
 
 
 # Link: create ELF output file from object files.

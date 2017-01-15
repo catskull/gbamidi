@@ -43,6 +43,13 @@
 #define SNDFX_LFO3_RANGE 47
 #define SNDFX_LFO3_FREQ 48
 
+#define SNDFX_PAN_CH1 49
+#define SNDFX_PAN_CH2 50
+#define SNDFX_PAN_CH3 51
+#define SNDFX_PAN_CH4 52
+#define SNDFX_PAN_CH10 53
+#define SNDFX_SAMPR 54
+#define SNDFX_MIDICHAN 55
 
 void soundPlayNote(int midiNote, int velocity);
 void soundPlayNoise(int midiNote, int velocity);

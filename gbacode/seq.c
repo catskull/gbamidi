@@ -23,6 +23,7 @@ Tiny little sequencer for e.g. drum loops.
 
 #include "sound.h"
 #include "seq.h"
+#include "nvmem.h"
 
 #define SEQ_REC_NONE 0
 #define SEQ_REC_KEYDOWN 1
@@ -30,10 +31,10 @@ Tiny little sequencer for e.g. drum loops.
 #define SEQ_REC_END 3
 
 #define NO_TRACKS 8
-#define MAX_RECS 256
+#define MAX_RECS 128 //Translates to usually 64 notes.
 #define MAX_NOTES 8
 
-struct seqRecordStruct {
+struct seqRecordStruct { //8 bytes per recotd
 	int timestamp;
 	char type;
 	char chan;
@@ -55,6 +56,10 @@ static int seqUiHasChanged=1;
 static int seqBassTransp=0;
 static int seqBassTranspLatch;
 static int bassNotesPlaying;
+
+void *seqGetTrackPtr(int track) {
+	return (void*)seqTrack[track];
+}
 
 int seqGetTimestamp() {
 	return seqTimeStamp;
@@ -115,6 +120,19 @@ void seqRecordTrack(int trackNo) {
 	seqTrack[trackNo][0].type=SEQ_REC_END;
 	startTrack();
 	seqUiHasChanged=1;
+}
+
+//Validate track, replace with an empty one if invalid.
+void seqValidateTrack(int trackno) {
+	int valid=1;
+
+	//Really stupid check. 
+	if (seqTrack[trackno][0].type>3) valid=0;
+
+	if (!valid) {
+		seqTrack[trackno][0].type=SEQ_REC_END;
+		seqUiHasChanged=1;
+	}
 }
 
 void seqPlayBack() {
@@ -189,6 +207,8 @@ void seqStop() {
 			seqRecordingTrack[minTsPos].type=SEQ_REC_END;
 		}
 		seqTrack[seqRecordingTrackNo][x].type=SEQ_REC_END;
+		//Dump to AVR for storage in nvmem
+		nvmemStoreTrack(seqRecordingTrackNo, (void *)seqTrack[seqRecordingTrackNo]);
 	}
 	seqRecordingTrackNo=-1;
 	seqTimeStamp=-1;

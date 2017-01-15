@@ -9,20 +9,14 @@ AS	:=	$(PREFIX)as
 LD	:=	$(PREFIX)ld
 AR	:=	$(PREFIX)ar
 OBJCOPY	:=	$(PREFIX)objcopy
-#OBJS := main.o sound.o midinotefreq.o int.o serial.o tiles.o ui.o ccs.o seq.o gfxloader.o
-OBJS := code.o
-SRCS :=  main.c sound.c midinotefreq.c int.c serial.c tiles.c ui.c ccs.c seq.c gfxloader.c
+OBJS := main.o sound.o midinotefreq.o int.o serial.o tiles.o ui.o ccs.o seq.o gfxloader.o nvmem.o
+#OBJS := code.o
+#SRCS :=  main.c sound.c midinotefreq.c int.c serial.c tiles.c ui.c ccs.c seq.c gfxloader.c nvmem.c tonc_bios.s
+#SRCS :=  main.c sound.c midinotefreq.c int.c serial.c tiles.c ui.c ccs.c seq.c gfxloader.c nvmem.c
 
-
-fwupdate.mid: gbafw2mid/gbafw2mid gbamidi.gba
-	gbafw2mid/gbafw2mid fwupdate.mid < gbamidi.gba > /dev/null
-
-gbafw2mid/gbafw2mid: gbafw2mid
-	make -C gbafw2mid
-
-gbamidi.gba: $(SRCS) crtls/crt0.o
+gbamidi.gba: $(OBJS) crtls/crt0.o
 #	$(LD) crtls/crt0.o $(OBJS) -o gbamidi.elf $(LDFLAGS)
-	$(CC) -nostdlib  -Wl,-Tcrtls/lnkscript $(CFLAGS) -o gbamidi.elf crtls/crt0.o $(SRCS)  --combine -ffreestanding -fwhole-program /home/jeroen/c/stm32/toolchain/lib/gcc/arm-none-eabi/4.5.2/libgcc.a 
+	$(CC) -nostdlib  -Wl,-Tcrtls/lnkscript $(CFLAGS) -o gbamidi.elf crtls/crt0.o $(OBJS)  -ffreestanding -fwhole-program /home/jeroen/c/stm32/toolchain/lib/gcc/arm-none-eabi/4.5.2/libgcc.a 
 	$(OBJCOPY) -O binary gbamidi.elf gbamidi.gba
 
 tiles.c: tiles.png gentiles.php

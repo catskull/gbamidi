@@ -23,24 +23,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "ccs.h"
 #include "sound.h"
 
-/*
-#define SNDFX_DUTYCYCLE 1
-#define SNDFX_SWEEP_DUTYCYCLE 2
-#define SNDFX_NOISE_BITS 3
-#define SNDFX_SAMPLE_SETSAMP 4
-#define SNDFX_PITCH 5
-#define SNDFX_SAMPLE_PITCH 6
-#define SNDFX_NOISE_PITCH 7
-#define SNDFX_SWEEP_PITCH 8
-#define SNDFX_SWEEP_VAL 9
-#define SNDFX_SWEEP_SPEED 10
-#define SNDFX_SWEEP_SNDLEN 11
-#define SNDFX_SWEEP_ENVELOPE 12
-#define SNDFX_DSNDSQUARE 13
-#define SNDFX_DSNDDUTY 14
-#define SNDFX_DSNDSAW 15
-#define SNDFX_DSOUND_PITCH 16
-*/
 
 struct ccValExplStruct lfoTargetExpl[]={
 	{8,			"Ch1 duty"},
@@ -104,6 +86,30 @@ struct ccValExplStruct dutyCycleExpl[]={
 	{0, NULL}
 };
 
+struct ccValExplStruct sampRateExpl[]={
+	{32,		"9bit/32KHz"},
+	{64,		"8bit/64KHz"},
+	{96,		"7bit/131KHz"},
+	{128,		"6bit/262KHz"},
+	{0, NULL}
+};
+
+
+struct ccValExplStruct panExpl[]={
+	{43,		"Left"},
+	{85,		"Center"},
+	{128,		"Right"},
+	{0, NULL}
+};
+
+struct ccValExplStruct midiChanExpl[]={
+	{32,		"Ch1-4,10"},
+	{64,		"Ch1-5"},
+	{96,		"Ch5-9"},
+	{128,		"Ch12-16"},
+	{0, NULL}
+};
+
 struct CcDefStruct myCcDefs[]={
 	{SNDFX_ARPEGGIATOR,	(1<<1)|(1<<2),	12,	"Arpeggiator speed",	NULL},
 	{SNDFX_SWEEP_VAL, 	(1<<3),			12,	"Sweep step size",		NULL},
@@ -116,9 +122,9 @@ struct CcDefStruct myCcDefs[]={
 	{SNDFX_SWEEP_SPEED,	(1<<3), 		14,	"Sweep speed",			NULL},
 	{SNDFX_DSNDSAW,		(1<<4), 		14,	"Saw wave pct",			NULL},
 	{SNDFX_DECAY,		(1<<4),			72,	"Decay length",			NULL},
-	{SNDFX_ENVELOPE,	(1<<1), 		73,	"Envelope lenghth",		NULL},
-	{SNDFX_SWEEP_ENVELOPE,	(1<<3), 	73,	"Envelope lenghth",		NULL},
-	{SNDFX_NOISE_ENVELOPE,	(1<<10), 	73,	"Envelope lenghth",		NULL},
+	{SNDFX_ENVELOPE,	(1<<1), 		73,	"Envelope length",		NULL},
+	{SNDFX_SWEEP_ENVELOPE,	(1<<3), 	73,	"Envelope length",		NULL},
+	{SNDFX_NOISE_ENVELOPE,	(1<<10), 	73,	"Envelope length",		NULL},
 	{SNDFX_SNDLEN,		(1<<1), 		74,	"Sound length",			NULL},
 	{SNDFX_SAMPLE_SNDLEN,(1<<2), 		74,	"Sound length",			NULL},
 	{SNDFX_SWEEP_SNDLEN,(1<<3), 		74,	"Sound length",			NULL},
@@ -126,6 +132,11 @@ struct CcDefStruct myCcDefs[]={
 	{SNDFX_GLISS_MODE,		(1<<1), 	75,	"Glissando mode",		glissModeExpl},
 	{SNDFX_SAMPLE_GLISS_MODE,(1<<2), 	75,	"Glissando mode",		glissModeExpl},
 	{SNDFX_GLISS_SPEED,	(1<<1)|(1<<2),	76,	"Glissando length",		NULL},
+	{SNDFX_PAN_CH1,		(1<<1),			10, "Pan",					panExpl},
+	{SNDFX_PAN_CH2,		(1<<2),			10, "Pan",					panExpl},
+	{SNDFX_PAN_CH3,		(1<<3),			10, "Pan",					panExpl},
+	{SNDFX_PAN_CH4,		(1<<4),			10, "Pan",					panExpl},
+	{SNDFX_PAN_CH10,	(1<<10),		10, "Pan",					panExpl},
 	{SNDFX_LFO1_TARGET,	0xFFFF,			16,	"LFO1 target",			lfoTargetExpl},
 	{SNDFX_LFO1_RANGE,	0xFFFF,			17,	"LFO1 range",			NULL},
 	{SNDFX_LFO1_FREQ,	0xFFFF,			18,	"LFO1 frequency",		NULL},
@@ -135,10 +146,12 @@ struct CcDefStruct myCcDefs[]={
 	{SNDFX_LFO3_TARGET,	0xFFFF,			22,	"LFO3 target",			lfoTargetExpl},
 	{SNDFX_LFO3_RANGE,	0xFFFF,			23,	"LFO3 range",			NULL},
 	{SNDFX_LFO3_FREQ,	0xFFFF,			24,	"LFO3 frequency",		NULL},
+	{SNDFX_SAMPR, 		0xFFFF,			0,	"Audio samp rate",		sampRateExpl},
+	{SNDFX_MIDICHAN,	0xFFFF,			0,	"MIDI channels",		midiChanExpl},
 	{SNDFX_SEQ_SPEED,	0x0,			0,	"Speed",				NULL},
 	{SNDFX_SEQ_BPMEAS,	0x0,			0,	"Bts/meas",				NULL},
 	{SNDFX_SEQ_NOMEAS,	0x0,			0,	"Measures",				NULL},
-	{SNDFX_SEQ_AUTOTO,	0x0,			0,	"Quantize to",		autoMeasExpl},
+	{SNDFX_SEQ_AUTOTO,	0x0,			0,	"Quantize to",			autoMeasExpl},
 	{SNDFX_SEQ_AUTOPCT,	0x0,			0,	"Quantize rate",		NULL},
 	{SNDFX_SEQ_BSPLIT,	0x0,			0,	"Bassline split",		NULL},
 	{SNDFX_SEQ_BOFF,	0x0,			0,	"Bassline offset",		NULL},

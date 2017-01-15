@@ -24,6 +24,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "sound.h"
 #include "gfxloader.h"
 #include "tiles.h"
+#include "serial.h"
+#include "nvmem.h"
+//#include "tonc_bios.h"
 
 #define KEY_RELEASED 0
 #define KEY_PRESSED 1
@@ -81,7 +84,7 @@ static unsigned short *palRam=(unsigned short *)0x05000000;
 static unsigned char *videoRam=(unsigned char *)0x06008000;
 static unsigned short *tiles=(unsigned short *)0x06000000;
 
-static void printStr(int x, int y, const char *str) {
+void printStr(int x, int y, const char *str) {
 	while (*str!=0) {
 		tiles[x+y*32]=(*str)-32;
 		str++;
@@ -89,7 +92,7 @@ static void printStr(int x, int y, const char *str) {
 	}
 }
 
-static void printInt(int x, int y, int n) {
+void printInt(int x, int y, int n) {
 	int v;
 	int t;
 	if (n<0) n=0;
@@ -105,6 +108,15 @@ static void printInt(int x, int y, int n) {
 		tiles[x+y*32]=('0')-32+v;
 		x--;
 	} while (n>0);
+}
+
+void printHex(int x, int y, int n) {
+	static const char *hexchars="0123456789ABCDEF";
+	tiles[x+y*32]=hexchars[(n>>4)&0xf]-32;
+	x++;
+	tiles[x+y*32]=hexchars[n&0xf]-32;
+	x++;
+	tiles[x+y*32]=0;
 }
 
 //val = (0..127)
@@ -144,6 +156,10 @@ static int selectedSlider=0;
 static int selectedSndFx=0;
 static int selectedTrack=0;
 static int inSequencer=0;
+static int inDbg=0;
+static int inPreset=0;
+static int presetSel=0;
+
 
 void redrawSliders() {
 	int i, x, y, n;
@@ -198,6 +214,49 @@ void redrawSliders() {
 
 }
 
+#define DBGBUFLEN (20*4)
+int uiDbgPosFirst=0;
+int uiDbgPosLast=0;
+char uiDbgBuff[DBGBUFLEN];
+int dbgRedrawNeeded;
+int dbgRedrawPressure=0;
+
+void uiDbgMidiIn(char c) {
+	uiDbgBuff[uiDbgPosLast]=c;
+	uiDbgPosLast++; 
+	if (uiDbgPosLast==DBGBUFLEN) uiDbgPosLast=0;
+	if (uiDbgPosFirst==uiDbgPosLast) uiDbgPosFirst++;
+	if (uiDbgPosFirst==DBGBUFLEN) uiDbgPosFirst=0;
+	dbgRedrawNeeded=1;
+	dbgRedrawPressure++;
+}
+
+void redrawDbg() {
+	static int maxPressure=0;
+	int x, y, i, p;
+	for (x=32*3; x<32*20; x++) tiles[x]=0;
+	x=0; y=4;
+	p=uiDbgPosFirst;
+	if (uiDbgPosLast-uiDbgPosFirst<8) p+=(p&7);
+	if (p>=DBGBUFLEN) p=0;
+	i=0;
+	while (p!=uiDbgPosLast) {
+		printHex(x, y, uiDbgBuff[p++]);
+		if (p>=DBGBUFLEN) p=0;
+		x+=3;
+		if (x>(8*3)) {
+			y++;
+			x=0;
+		}
+	}
+	if (dbgRedrawPressure>32) {
+		maxPressure=serialGetMaxPressure();
+		dbgRedrawPressure=0;
+	}
+	printStr(0, 15, "Ser pressure:");
+	printHex(16, 15, maxPressure);
+}
+
 void redrawSequencer() {
 	int x;
 	for (x=32*3; x<32*20; x++) tiles[x]=0;
@@ -229,6 +288,25 @@ void redrawSequencer() {
 	printStr(0, 19, "L/R=MUTE A=PLAY B=REC SEL=CCS");
 }
 
+
+void redrawPreset() {
+	int x;
+	for (x=32*3; x<32*20; x++) tiles[x]=0;
+	printStr(5, 3, "LOAD/SAVE PRESETS");
+
+	for (x=0; x<8; x++) {
+		printStr(1, x+5, "Presetx   LOAD  SAVE");
+		printInt(6, x+5, x+1);
+	}
+	x=presetSel&7;
+	if ((presetSel&8)==0) {
+		tiles[(x+5)*32+10]=TILE_ARROW;
+	} else {
+		tiles[(x+5)*32+16]=TILE_ARROW;
+	}
+	printStr(0, 19, "A=LOAD/SAVE START=BACK");
+}
+
 void uiTick() {
 	static int didThisVbl=0;
 	int redrawNeeded;
@@ -242,12 +320,53 @@ void uiTick() {
 	
 	parseKeys();
 	
+	if (keys[KEY_START]==KEY_CLICK) {
+		inPreset=!inPreset;
+		redrawNeeded=1;
+	}
+	
+	if (keys[KEY_SLEFT]==KEY_CLICK && keys[KEY_SRIGHT]==KEY_PRESSED) {
+		inDbg=!inDbg;
+		redrawNeeded=1;
+	}
+	
 	if (keys[KEY_SELECT]==KEY_CLICK) {
 		inSequencer=!inSequencer;
 		redrawNeeded=1;
 	}
-
-	if (inSequencer) {
+	
+	if (inDbg) {
+		if (dbgRedrawNeeded) redrawNeeded=1;
+		if (keys[KEY_A]==KEY_CLICK || keys[KEY_B]==KEY_CLICK) {
+			uiDbgPosFirst=0;
+			uiDbgPosLast=0;
+		}
+		if (redrawNeeded) {
+			dbgRedrawNeeded=0;
+			redrawDbg();
+		}
+	} else if (inPreset) {
+		int oldPreset=presetSel;
+		if (keys[KEY_UP]==KEY_CLICK) presetSel--;
+		if (keys[KEY_DOWN]==KEY_CLICK) presetSel++;
+		if (keys[KEY_LEFT]==KEY_CLICK) presetSel+=8;
+		if (keys[KEY_RIGHT]==KEY_CLICK) presetSel-=8;
+		if (keys[KEY_A]==KEY_CLICK) {
+			if ((presetSel&8)==0) {
+				nvmemPresetLoad(presetSel&7);
+			} else {
+				nvmemPresetSave(presetSel&7);
+			}
+			inPreset=0;
+			redrawNeeded=1;
+		}
+		presetSel&=15;
+		if (oldPreset!=presetSel) redrawNeeded=1;
+		if (redrawNeeded) {
+			redrawPreset();
+			redrawNeeded=0;
+		}
+	} else if (inSequencer) {
 		redrawNeeded|=seqUiChanged();
 		if (keys[KEY_UP]==KEY_CLICK) {
 			selectedTrack--;
@@ -323,6 +442,6 @@ void uiInit() {
 	for (x=0; x<16; x++) palRam[x]=paletteData[x];
 
 	printStr(0, 0, "     GBAMIDI BY SPRITE_TM     ");
-	printStr(0, 1, "      (SPRITESMODS.COM)  v1.0 ");
+	printStr(0, 1, "      (SPRITESMODS.COM)  v1.6 ");
 	redrawSliders();
 }

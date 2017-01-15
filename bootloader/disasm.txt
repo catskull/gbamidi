@@ -1,0 +1,1324 @@
+
+gbamidibl.elf:     file format elf32-avr
+
+
+Disassembly of section .text:
+
+00007800 <__vectors>:
+    7800:	33 c0       	rjmp	.+102    	; 0x7868 <__ctors_end>
+    7802:	00 00       	nop
+    7804:	41 c0       	rjmp	.+130    	; 0x7888 <__bad_interrupt>
+    7806:	00 00       	nop
+    7808:	3f c0       	rjmp	.+126    	; 0x7888 <__bad_interrupt>
+    780a:	00 00       	nop
+    780c:	3d c0       	rjmp	.+122    	; 0x7888 <__bad_interrupt>
+    780e:	00 00       	nop
+    7810:	3b c0       	rjmp	.+118    	; 0x7888 <__bad_interrupt>
+    7812:	00 00       	nop
+    7814:	39 c0       	rjmp	.+114    	; 0x7888 <__bad_interrupt>
+    7816:	00 00       	nop
+    7818:	37 c0       	rjmp	.+110    	; 0x7888 <__bad_interrupt>
+    781a:	00 00       	nop
+    781c:	35 c0       	rjmp	.+106    	; 0x7888 <__bad_interrupt>
+    781e:	00 00       	nop
+    7820:	33 c0       	rjmp	.+102    	; 0x7888 <__bad_interrupt>
+    7822:	00 00       	nop
+    7824:	31 c0       	rjmp	.+98     	; 0x7888 <__bad_interrupt>
+    7826:	00 00       	nop
+    7828:	2f c0       	rjmp	.+94     	; 0x7888 <__bad_interrupt>
+    782a:	00 00       	nop
+    782c:	7c c2       	rjmp	.+1272   	; 0x7d26 <__vector_11>
+    782e:	00 00       	nop
+    7830:	2b c0       	rjmp	.+86     	; 0x7888 <__bad_interrupt>
+    7832:	00 00       	nop
+    7834:	29 c0       	rjmp	.+82     	; 0x7888 <__bad_interrupt>
+    7836:	00 00       	nop
+    7838:	27 c0       	rjmp	.+78     	; 0x7888 <__bad_interrupt>
+    783a:	00 00       	nop
+    783c:	25 c0       	rjmp	.+74     	; 0x7888 <__bad_interrupt>
+    783e:	00 00       	nop
+    7840:	23 c0       	rjmp	.+70     	; 0x7888 <__bad_interrupt>
+    7842:	00 00       	nop
+    7844:	21 c0       	rjmp	.+66     	; 0x7888 <__bad_interrupt>
+    7846:	00 00       	nop
+    7848:	3c c2       	rjmp	.+1144   	; 0x7cc2 <__vector_18>
+    784a:	00 00       	nop
+    784c:	1d c0       	rjmp	.+58     	; 0x7888 <__bad_interrupt>
+    784e:	00 00       	nop
+    7850:	1b c0       	rjmp	.+54     	; 0x7888 <__bad_interrupt>
+    7852:	00 00       	nop
+    7854:	19 c0       	rjmp	.+50     	; 0x7888 <__bad_interrupt>
+    7856:	00 00       	nop
+    7858:	17 c0       	rjmp	.+46     	; 0x7888 <__bad_interrupt>
+    785a:	00 00       	nop
+    785c:	15 c0       	rjmp	.+42     	; 0x7888 <__bad_interrupt>
+    785e:	00 00       	nop
+    7860:	13 c0       	rjmp	.+38     	; 0x7888 <__bad_interrupt>
+    7862:	00 00       	nop
+    7864:	11 c0       	rjmp	.+34     	; 0x7888 <__bad_interrupt>
+	...
+
+00007868 <__ctors_end>:
+    7868:	11 24       	eor	r1, r1
+    786a:	1f be       	out	0x3f, r1	; 63
+    786c:	cf ef       	ldi	r28, 0xFF	; 255
+    786e:	d8 e0       	ldi	r29, 0x08	; 8
+    7870:	de bf       	out	0x3e, r29	; 62
+    7872:	cd bf       	out	0x3d, r28	; 61
+
+00007874 <__do_clear_bss>:
+    7874:	11 e0       	ldi	r17, 0x01	; 1
+    7876:	a0 e0       	ldi	r26, 0x00	; 0
+    7878:	b1 e0       	ldi	r27, 0x01	; 1
+    787a:	01 c0       	rjmp	.+2      	; 0x787e <.do_clear_bss_start>
+
+0000787c <.do_clear_bss_loop>:
+    787c:	1d 92       	st	X+, r1
+
+0000787e <.do_clear_bss_start>:
+    787e:	a7 34       	cpi	r26, 0x47	; 71
+    7880:	b1 07       	cpc	r27, r17
+    7882:	e1 f7       	brne	.-8      	; 0x787c <.do_clear_bss_loop>
+    7884:	02 d1       	rcall	.+516    	; 0x7a8a <main>
+    7886:	1c c3       	rjmp	.+1592   	; 0x7ec0 <_exit>
+
+00007888 <__bad_interrupt>:
+    7888:	bb cf       	rjmp	.-138    	; 0x7800 <__vectors>
+
+0000788a <midiGetChar>:
+	if (wpos>=midiInBuff+BUFSZ) wpos=midiInBuff;
+}
+
+unsigned char midiGetChar(void) {
+	unsigned char ret;
+	while (wpos==rpos) ;
+    788a:	20 91 40 01 	lds	r18, 0x0140
+    788e:	30 91 41 01 	lds	r19, 0x0141
+    7892:	80 91 42 01 	lds	r24, 0x0142
+    7896:	90 91 43 01 	lds	r25, 0x0143
+    789a:	28 17       	cp	r18, r24
+    789c:	39 07       	cpc	r19, r25
+    789e:	a9 f3       	breq	.-22     	; 0x788a <midiGetChar>
+	ret=*rpos;
+    78a0:	e0 91 42 01 	lds	r30, 0x0142
+    78a4:	f0 91 43 01 	lds	r31, 0x0143
+    78a8:	80 81       	ld	r24, Z
+	rpos++;
+    78aa:	20 91 42 01 	lds	r18, 0x0142
+    78ae:	30 91 43 01 	lds	r19, 0x0143
+    78b2:	2f 5f       	subi	r18, 0xFF	; 255
+    78b4:	3f 4f       	sbci	r19, 0xFF	; 255
+    78b6:	30 93 43 01 	sts	0x0143, r19
+    78ba:	20 93 42 01 	sts	0x0142, r18
+	if (rpos>=midiInBuff+BUFSZ) rpos=midiInBuff;
+    78be:	20 91 42 01 	lds	r18, 0x0142
+    78c2:	30 91 43 01 	lds	r19, 0x0143
+    78c6:	91 e0       	ldi	r25, 0x01	; 1
+    78c8:	2f 33       	cpi	r18, 0x3F	; 63
+    78ca:	39 07       	cpc	r19, r25
+    78cc:	30 f0       	brcs	.+12     	; 0x78da <midiGetChar+0x50>
+    78ce:	20 e0       	ldi	r18, 0x00	; 0
+    78d0:	31 e0       	ldi	r19, 0x01	; 1
+    78d2:	30 93 43 01 	sts	0x0143, r19
+    78d6:	20 93 42 01 	sts	0x0142, r18
+	return ret;
+}
+    78da:	08 95       	ret
+
+000078dc <timeoutReset>:
+	TIMSK1=2; //enable oc1a int
+	OCR1A=40000;  //about 2 seconds at 20KHz
+}
+
+void timeoutReset(void) {
+	TCNT1=0;
+    78dc:	10 92 85 00 	sts	0x0085, r1
+    78e0:	10 92 84 00 	sts	0x0084, r1
+    78e4:	08 95       	ret
+
+000078e6 <wait.4534>:
+//The char should take (F_CPU/115200) cycles. Unfortunately, that doesn't completely work, so there's a small
+//painstakenly measured value substracted...
+#define CHARLEN ((F_CPU/115200)-13)
+
+static void wait(unsigned int len) {
+	while(TCNT0<=len) ;
+    78e6:	26 b5       	in	r18, 0x26	; 38
+    78e8:	30 e0       	ldi	r19, 0x00	; 0
+    78ea:	82 17       	cp	r24, r18
+    78ec:	93 07       	cpc	r25, r19
+    78ee:	d8 f7       	brcc	.-10     	; 0x78e6 <wait.4534>
+	TCNT0=0;
+    78f0:	16 bc       	out	0x26, r1	; 38
+}
+    78f2:	08 95       	ret
+
+000078f4 <gbaSerXfer>:
+	}
+	PORTB|=(1<<GBA_SD);
+	wait(CHARLEN); //stop bit
+}
+
+unsigned int gbaSerXfer(unsigned int data) {
+    78f4:	ef 92       	push	r14
+    78f6:	ff 92       	push	r15
+    78f8:	0f 93       	push	r16
+    78fa:	1f 93       	push	r17
+    78fc:	cf 93       	push	r28
+    78fe:	df 93       	push	r29
+    7900:	8c 01       	movw	r16, r24
+}
+
+void gbaSerTx(unsigned int data) {
+	int t=0;
+	//Make SD and SC input
+	PORTB|=(1<<GBA_SD);
+    7902:	29 9a       	sbi	0x05, 1	; 5
+	DDRB&=~(1<<GBA_SD);
+    7904:	21 98       	cbi	0x04, 1	; 4
+	PORTC|=(1<<GBA_SC);
+    7906:	40 9a       	sbi	0x08, 0	; 8
+	DDRC&=~(1<<GBA_SC);
+    7908:	38 98       	cbi	0x07, 0	; 7
+
+	//Tell the GBA we're sending by raising its SI
+	PORTB|=(1<<GBA_SI);
+    790a:	2a 9a       	sbi	0x05, 2	; 5
+	wait(0);
+    790c:	80 e0       	ldi	r24, 0x00	; 0
+    790e:	90 e0       	ldi	r25, 0x00	; 0
+    7910:	ea df       	rcall	.-44     	; 0x78e6 <wait.4534>
+    7912:	c0 e0       	ldi	r28, 0x00	; 0
+	PORTC|=(1<<GBA_SC);
+	return ret;
+}
+
+void gbaSerTx(unsigned int data) {
+	int t=0;
+    7914:	d0 e0       	ldi	r29, 0x00	; 0
+    7916:	08 c0       	rjmp	.+16     	; 0x7928 <gbaSerXfer+0x34>
+    7918:	80 e5       	ldi	r24, 0x50	; 80
+	PORTB|=(1<<GBA_SI);
+	wait(0);
+
+	//Wait for SD and SC to go high
+	while ((PINC&(1<<GBA_SC))==0 || (PINB&(1<<GBA_SD))==0) {
+		wait(CHARLEN/2);
+    791a:	90 e0       	ldi	r25, 0x00	; 0
+    791c:	e4 df       	rcall	.-56     	; 0x78e6 <wait.4534>
+    791e:	21 96       	adiw	r28, 0x01	; 1
+    7920:	27 e2       	ldi	r18, 0x27	; 39
+		t++;
+    7922:	c1 31       	cpi	r28, 0x11	; 17
+		if (t>10000) {
+    7924:	d2 07       	cpc	r29, r18
+    7926:	29 f1       	breq	.+74     	; 0x7972 <gbaSerXfer+0x7e>
+    7928:	30 9b       	sbis	0x06, 0	; 6
+    792a:	f6 cf       	rjmp	.-20     	; 0x7918 <gbaSerXfer+0x24>
+	//Tell the GBA we're sending by raising its SI
+	PORTB|=(1<<GBA_SI);
+	wait(0);
+
+	//Wait for SD and SC to go high
+	while ((PINC&(1<<GBA_SC))==0 || (PINB&(1<<GBA_SD))==0) {
+    792c:	19 9b       	sbis	0x03, 1	; 3
+    792e:	f4 cf       	rjmp	.-24     	; 0x7918 <gbaSerXfer+0x24>
+    7930:	c8 e0       	ldi	r28, 0x08	; 8
+    7932:	d0 e0       	ldi	r29, 0x00	; 0
+    7934:	80 ea       	ldi	r24, 0xA0	; 160
+    7936:	90 e0       	ldi	r25, 0x00	; 0
+			return;
+		}
+	}
+	//Wait 8 bit-times
+	//Make SD and SC output (& low)
+	for (t=0; t<8; t++) wait(CHARLEN);
+    7938:	d6 df       	rcall	.-84     	; 0x78e6 <wait.4534>
+    793a:	21 97       	sbiw	r28, 0x01	; 1
+    793c:	d9 f7       	brne	.-10     	; 0x7934 <gbaSerXfer+0x40>
+    793e:	38 9a       	sbi	0x07, 0	; 7
+    7940:	21 9a       	sbi	0x04, 1	; 4
+    7942:	40 98       	cbi	0x08, 0	; 8
+	DDRC|=(1<<GBA_SC);
+    7944:	29 98       	cbi	0x05, 1	; 5
+	DDRB|=(1<<GBA_SD);
+    7946:	80 ea       	ldi	r24, 0xA0	; 160
+	PORTC&=~(1<<GBA_SC);
+    7948:	90 e0       	ldi	r25, 0x00	; 0
+	PORTB&=~(1<<GBA_SD);
+    794a:	cd df       	rcall	.-102    	; 0x78e6 <wait.4534>
+
+	wait(CHARLEN); //start bit
+    794c:	c0 e1       	ldi	r28, 0x10	; 16
+    794e:	d0 e0       	ldi	r29, 0x00	; 0
+    7950:	00 ff       	sbrs	r16, 0
+    7952:	02 c0       	rjmp	.+4      	; 0x7958 <gbaSerXfer+0x64>
+    7954:	29 9a       	sbi	0x05, 1	; 5
+    7956:	01 c0       	rjmp	.+2      	; 0x795a <gbaSerXfer+0x66>
+	for (int x=0; x<16; x++) {
+		if (data&1) {
+    7958:	29 98       	cbi	0x05, 1	; 5
+    795a:	80 ea       	ldi	r24, 0xA0	; 160
+			PORTB|=(1<<GBA_SD); 
+    795c:	90 e0       	ldi	r25, 0x00	; 0
+    795e:	c3 df       	rcall	.-122    	; 0x78e6 <wait.4534>
+		} else {
+			PORTB&=~(1<<GBA_SD);
+    7960:	21 97       	sbiw	r28, 0x01	; 1
+		}
+		wait(CHARLEN); //data bit
+    7962:	19 f0       	breq	.+6      	; 0x796a <gbaSerXfer+0x76>
+    7964:	16 95       	lsr	r17
+    7966:	07 95       	ror	r16
+    7968:	f3 cf       	rjmp	.-26     	; 0x7950 <gbaSerXfer+0x5c>
+    796a:	29 9a       	sbi	0x05, 1	; 5
+	DDRB|=(1<<GBA_SD);
+	PORTC&=~(1<<GBA_SC);
+	PORTB&=~(1<<GBA_SD);
+
+	wait(CHARLEN); //start bit
+	for (int x=0; x<16; x++) {
+    796c:	80 ea       	ldi	r24, 0xA0	; 160
+			PORTB|=(1<<GBA_SD); 
+		} else {
+			PORTB&=~(1<<GBA_SD);
+		}
+		wait(CHARLEN); //data bit
+		data>>=1;
+    796e:	90 e0       	ldi	r25, 0x00	; 0
+    7970:	ba df       	rcall	.-140    	; 0x78e6 <wait.4534>
+    7972:	29 9a       	sbi	0x05, 1	; 5
+	}
+	PORTB|=(1<<GBA_SD);
+    7974:	21 98       	cbi	0x04, 1	; 4
+	wait(CHARLEN); //stop bit
+    7976:	80 e0       	ldi	r24, 0x00	; 0
+    7978:	90 e0       	ldi	r25, 0x00	; 0
+    797a:	b5 df       	rcall	.-150    	; 0x78e6 <wait.4534>
+    797c:	80 ea       	ldi	r24, 0xA0	; 160
+
+unsigned int gbaSerRx(void) {
+	unsigned int ret=0;
+	int t=0;
+	//Make SD pin input
+	PORTB|=(1<<GBA_SD);
+    797e:	90 e0       	ldi	r25, 0x00	; 0
+	DDRB&=~(1<<GBA_SD);
+    7980:	b2 df       	rcall	.-156    	; 0x78e6 <wait.4534>
+	wait(0);
+    7982:	2a 98       	cbi	0x05, 2	; 5
+    7984:	c0 e0       	ldi	r28, 0x00	; 0
+    7986:	d0 e0       	ldi	r29, 0x00	; 0
+    7988:	0e c0       	rjmp	.+28     	; 0x79a6 <gbaSerXfer+0xb2>
+//	PORTC&=~(1<<GBA_SC);
+	//Tell GBA we want a word by lowering its SI
+	wait(CHARLEN);
+    798a:	21 96       	adiw	r28, 0x01	; 1
+    798c:	37 e2       	ldi	r19, 0x27	; 39
+    798e:	c1 31       	cpi	r28, 0x11	; 17
+    7990:	d3 07       	cpc	r29, r19
+	PORTB&=~(1<<GBA_SI);
+    7992:	31 f4       	brne	.+12     	; 0x79a0 <gbaSerXfer+0xac>
+	TCNT0=0;
+}
+
+unsigned int gbaSerRx(void) {
+	unsigned int ret=0;
+	int t=0;
+    7994:	38 9a       	sbi	0x07, 0	; 7
+    7996:	40 9a       	sbi	0x08, 0	; 8
+    7998:	2a 9a       	sbi	0x05, 2	; 5
+	//Tell GBA we want a word by lowering its SI
+	wait(CHARLEN);
+	PORTB&=~(1<<GBA_SI);
+	//Wait for startbit
+	while(PINB&(1<<GBA_SD)) {
+		t++;
+    799a:	cf ef       	ldi	r28, 0xFF	; 255
+		if (t>10000) {
+    799c:	df ef       	ldi	r29, 0xFF	; 255
+    799e:	1c c0       	rjmp	.+56     	; 0x79d8 <gbaSerXfer+0xe4>
+    79a0:	80 e5       	ldi	r24, 0x50	; 80
+    79a2:	90 e0       	ldi	r25, 0x00	; 0
+			DDRC|=(1<<GBA_SC);
+    79a4:	a0 df       	rcall	.-192    	; 0x78e6 <wait.4534>
+			PORTC|=(1<<GBA_SC);
+    79a6:	19 99       	sbic	0x03, 1	; 3
+			PORTB|=(1<<GBA_SI);
+    79a8:	f0 cf       	rjmp	.-32     	; 0x798a <gbaSerXfer+0x96>
+			return 0xFFFF;
+    79aa:	80 ea       	ldi	r24, 0xA0	; 160
+    79ac:	90 e0       	ldi	r25, 0x00	; 0
+    79ae:	9b df       	rcall	.-202    	; 0x78e6 <wait.4534>
+		}
+		wait(CHARLEN/2);
+    79b0:	00 e1       	ldi	r16, 0x10	; 16
+    79b2:	10 e0       	ldi	r17, 0x00	; 0
+    79b4:	c0 e0       	ldi	r28, 0x00	; 0
+    79b6:	d0 e0       	ldi	r29, 0x00	; 0
+//	PORTC&=~(1<<GBA_SC);
+	//Tell GBA we want a word by lowering its SI
+	wait(CHARLEN);
+	PORTB&=~(1<<GBA_SI);
+	//Wait for startbit
+	while(PINB&(1<<GBA_SD)) {
+    79b8:	d6 95       	lsr	r29
+    79ba:	c7 95       	ror	r28
+			PORTB|=(1<<GBA_SI);
+			return 0xFFFF;
+		}
+		wait(CHARLEN/2);
+	}
+	wait(CHARLEN); //start bit
+    79bc:	19 99       	sbic	0x03, 1	; 3
+    79be:	d0 68       	ori	r29, 0x80	; 128
+    79c0:	80 ea       	ldi	r24, 0xA0	; 160
+    79c2:	90 e0       	ldi	r25, 0x00	; 0
+    79c4:	90 df       	rcall	.-224    	; 0x78e6 <wait.4534>
+    79c6:	01 50       	subi	r16, 0x01	; 1
+	while(TCNT0<=len) ;
+	TCNT0=0;
+}
+
+unsigned int gbaSerRx(void) {
+	unsigned int ret=0;
+    79c8:	10 40       	sbci	r17, 0x00	; 0
+    79ca:	b1 f7       	brne	.-20     	; 0x79b8 <gbaSerXfer+0xc4>
+		}
+		wait(CHARLEN/2);
+	}
+	wait(CHARLEN); //start bit
+	for (int x=0; x<16; x++) {
+		ret>>=1;
+    79cc:	80 ea       	ldi	r24, 0xA0	; 160
+    79ce:	90 e0       	ldi	r25, 0x00	; 0
+		if (PINB&(1<<GBA_SD)) ret|=(1<<15);
+    79d0:	8a df       	rcall	.-236    	; 0x78e6 <wait.4534>
+    79d2:	2a 9a       	sbi	0x05, 2	; 5
+		wait(CHARLEN);
+    79d4:	38 9a       	sbi	0x07, 0	; 7
+    79d6:	40 9a       	sbi	0x08, 0	; 8
+    79d8:	7e 01       	movw	r14, r28
+    79da:	ce 01       	movw	r24, r28
+    79dc:	cd b7       	in	r28, 0x3d	; 61
+    79de:	de b7       	in	r29, 0x3e	; 62
+			return 0xFFFF;
+		}
+		wait(CHARLEN/2);
+	}
+	wait(CHARLEN); //start bit
+	for (int x=0; x<16; x++) {
+    79e0:	e6 e0       	ldi	r30, 0x06	; 6
+		ret>>=1;
+		if (PINB&(1<<GBA_SD)) ret|=(1<<15);
+		wait(CHARLEN);
+	}
+	wait(CHARLEN); //stop bit
+    79e2:	39 c2       	rjmp	.+1138   	; 0x7e56 <__epilogue_restores__+0x18>
+
+000079e4 <payloadBoot>:
+//http://www.obdev.at/products/vusb/usbasploader.html
+static void (*nullVector)(void) __attribute__((__noreturn__));
+
+char payloadBoot() {
+	//Fix int vectors to userspace range
+	MCUCR=1; MCUCR=0;
+    79e4:	81 e0       	ldi	r24, 0x01	; 1
+    79e6:	85 bf       	out	0x35, r24	; 53
+    79e8:	15 be       	out	0x35, r1	; 53
+	//Reset the registers we touched
+	PORTC=0; DDRC=0;
+    79ea:	18 b8       	out	0x08, r1	; 8
+    79ec:	17 b8       	out	0x07, r1	; 7
+	TCCR1A=0; TCCR1B=0;
+    79ee:	10 92 80 00 	sts	0x0080, r1
+    79f2:	10 92 81 00 	sts	0x0081, r1
+	TIMSK1=0; TIMSK0=0;
+    79f6:	10 92 6f 00 	sts	0x006F, r1
+    79fa:	10 92 6e 00 	sts	0x006E, r1
+	UCSR0A=0; UCSR0B=0; UCSR0C=6;
+    79fe:	10 92 c0 00 	sts	0x00C0, r1
+    7a02:	10 92 c1 00 	sts	0x00C1, r1
+    7a06:	86 e0       	ldi	r24, 0x06	; 6
+    7a08:	80 93 c2 00 	sts	0x00C2, r24
+	//Boot into userspace
+	nullVector();
+    7a0c:	e0 91 44 01 	lds	r30, 0x0144
+    7a10:	f0 91 45 01 	lds	r31, 0x0145
+    7a14:	09 95       	icall
+
+00007a16 <payloadCheck>:
+
+//Payload metadata gets saved at end of EEPROM mem.
+const char *eep_metadata=(const char *)(1024-4);
+
+//Check payload against a simple 
+char payloadCheck() {
+    7a16:	0f 93       	push	r16
+    7a18:	1f 93       	push	r17
+    7a1a:	cf 93       	push	r28
+    7a1c:	df 93       	push	r29
+	unsigned int len, i;
+	unsigned int chsum=0xFFFF, tchsum;
+	unsigned int *p PROGMEM=(unsigned int *)0;
+	len=eeprom_read_word(&eep_metadata[0]);
+    7a1e:	8c ef       	ldi	r24, 0xFC	; 252
+    7a20:	93 e0       	ldi	r25, 0x03	; 3
+    7a22:	28 d2       	rcall	.+1104   	; 0x7e74 <__eerd_word_m328>
+    7a24:	ec 01       	movw	r28, r24
+    7a26:	8e ef       	ldi	r24, 0xFE	; 254
+	tchsum=eeprom_read_word(&eep_metadata[2]);
+    7a28:	93 e0       	ldi	r25, 0x03	; 3
+    7a2a:	24 d2       	rcall	.+1096   	; 0x7e74 <__eerd_word_m328>
+    7a2c:	bc 01       	movw	r22, r24
+    7a2e:	c0 32       	cpi	r28, 0x20	; 32
+    7a30:	d1 05       	cpc	r29, r1
+	if (len<32 || len>32*1024) return 0; //Impossible length.
+    7a32:	28 f1       	brcs	.+74     	; 0x7a7e <payloadCheck+0x68>
+    7a34:	80 e8       	ldi	r24, 0x80	; 128
+    7a36:	c1 30       	cpi	r28, 0x01	; 1
+    7a38:	d8 07       	cpc	r29, r24
+    7a3a:	08 f5       	brcc	.+66     	; 0x7a7e <payloadCheck+0x68>
+    7a3c:	2f ef       	ldi	r18, 0xFF	; 255
+    7a3e:	3f ef       	ldi	r19, 0xFF	; 255
+    7a40:	40 e0       	ldi	r20, 0x00	; 0
+    7a42:	50 e0       	ldi	r21, 0x00	; 0
+    7a44:	92 2f       	mov	r25, r18
+    7a46:	97 95       	ror	r25
+	for (i=0; i<len; i+=2) {
+		chsum=(chsum>>1)+((chsum&1)<<15);
+    7a48:	99 27       	eor	r25, r25
+    7a4a:	97 95       	ror	r25
+    7a4c:	83 2f       	mov	r24, r19
+    7a4e:	86 95       	lsr	r24
+    7a50:	19 2f       	mov	r17, r25
+    7a52:	18 2b       	or	r17, r24
+    7a54:	83 2f       	mov	r24, r19
+    7a56:	87 95       	ror	r24
+    7a58:	88 27       	eor	r24, r24
+    7a5a:	87 95       	ror	r24
+    7a5c:	26 95       	lsr	r18
+    7a5e:	08 2f       	mov	r16, r24
+    7a60:	02 2b       	or	r16, r18
+    7a62:	fa 01       	movw	r30, r20
+    7a64:	25 91       	lpm	r18, Z+
+		chsum+=pgm_read_word(p++);
+    7a66:	34 91       	lpm	r19, Z+
+    7a68:	20 0f       	add	r18, r16
+    7a6a:	31 1f       	adc	r19, r17
+    7a6c:	4e 5f       	subi	r20, 0xFE	; 254
+    7a6e:	5f 4f       	sbci	r21, 0xFF	; 255
+	unsigned int chsum=0xFFFF, tchsum;
+	unsigned int *p PROGMEM=(unsigned int *)0;
+	len=eeprom_read_word(&eep_metadata[0]);
+	tchsum=eeprom_read_word(&eep_metadata[2]);
+	if (len<32 || len>32*1024) return 0; //Impossible length.
+	for (i=0; i<len; i+=2) {
+    7a70:	4c 17       	cp	r20, r28
+    7a72:	5d 07       	cpc	r21, r29
+    7a74:	38 f3       	brcs	.-50     	; 0x7a44 <payloadCheck+0x2e>
+    7a76:	81 e0       	ldi	r24, 0x01	; 1
+    7a78:	26 17       	cp	r18, r22
+	unsigned int len, i;
+	unsigned int chsum=0xFFFF, tchsum;
+	unsigned int *p PROGMEM=(unsigned int *)0;
+	len=eeprom_read_word(&eep_metadata[0]);
+	tchsum=eeprom_read_word(&eep_metadata[2]);
+	if (len<32 || len>32*1024) return 0; //Impossible length.
+    7a7a:	37 07       	cpc	r19, r23
+    7a7c:	09 f0       	breq	.+2      	; 0x7a80 <payloadCheck+0x6a>
+    7a7e:	80 e0       	ldi	r24, 0x00	; 0
+    7a80:	df 91       	pop	r29
+    7a82:	cf 91       	pop	r28
+		chsum=(chsum>>1)+((chsum&1)<<15);
+		chsum+=pgm_read_word(p++);
+	}
+	if (chsum!=tchsum) return 0;
+	return 1;
+}
+    7a84:	1f 91       	pop	r17
+    7a86:	0f 91       	pop	r16
+    7a88:	08 95       	ret
+
+00007a8a <main>:
+		}
+	}
+}
+
+
+int main(void) {
+    7a8a:	a0 e0       	ldi	r26, 0x00	; 0
+    7a8c:	b1 e0       	ldi	r27, 0x01	; 1
+    7a8e:	ea e4       	ldi	r30, 0x4A	; 74
+    7a90:	fd e3       	ldi	r31, 0x3D	; 61
+    7a92:	b9 c1       	rjmp	.+882    	; 0x7e06 <__prologue_saves__>
+    7a94:	80 e7       	ldi	r24, 0x70	; 112
+    7a96:	97 e1       	ldi	r25, 0x17	; 23
+    7a98:	24 ef       	ldi	r18, 0xF4	; 244
+    milliseconds can be achieved.
+ */
+void
+_delay_loop_2(uint16_t __count)
+{
+	__asm__ volatile (
+    7a9a:	31 e0       	ldi	r19, 0x01	; 1
+    7a9c:	f9 01       	movw	r30, r18
+    7a9e:	31 97       	sbiw	r30, 0x01	; 1
+    7aa0:	f1 f7       	brne	.-4      	; 0x7a9e <main+0x14>
+    7aa2:	01 97       	sbiw	r24, 0x01	; 1
+    7aa4:	d9 f7       	brne	.-10     	; 0x7a9c <main+0x12>
+    7aa6:	31 e0       	ldi	r19, 0x01	; 1
+	return gbaSerRx();
+}
+
+
+void gbaSerInit(void) {
+	TCCR0B=1; //run timer0 at full speed
+    7aa8:	35 bd       	out	0x25, r19	; 37
+    7aaa:	22 9a       	sbi	0x04, 2	; 4
+	DDRB|=(1<<GBA_SI);
+    7aac:	85 b1       	in	r24, 0x05	; 5
+	PORTB|=(1<<GBA_SD)|(1<<GBA_SI)|(1<<GBA_SO);
+    7aae:	87 60       	ori	r24, 0x07	; 7
+    7ab0:	85 b9       	out	0x05, r24	; 5
+    7ab2:	40 9a       	sbi	0x08, 0	; 8
+    7ab4:	80 e0       	ldi	r24, 0x00	; 0
+
+void midiInit(void) {
+	wpos=midiInBuff;
+    7ab6:	91 e0       	ldi	r25, 0x01	; 1
+    7ab8:	90 93 41 01 	sts	0x0141, r25
+    7abc:	80 93 40 01 	sts	0x0140, r24
+    7ac0:	90 93 43 01 	sts	0x0143, r25
+	rpos=midiInBuff;
+    7ac4:	80 93 42 01 	sts	0x0142, r24
+    7ac8:	88 e9       	ldi	r24, 0x98	; 152
+    UCSR0B=0x98;
+    7aca:	80 93 c1 00 	sts	0x00C1, r24
+    7ace:	87 e2       	ldi	r24, 0x27	; 39
+    UBRR0L=UBRVAL&0xff;
+    7ad0:	80 93 c4 00 	sts	0x00C4, r24
+    7ad4:	10 92 c5 00 	sts	0x00C5, r1
+    7ad8:	10 92 80 00 	sts	0x0080, r1
+	//Kill this int so the device will stay in bootloader mode
+	TIMSK1&=~(2); //disable oc1a int
+}
+
+void timeoutInit(void) {
+	TCCR1A=0;
+    7adc:	85 e0       	ldi	r24, 0x05	; 5
+	TCCR1B=5; // /1024
+    7ade:	80 93 81 00 	sts	0x0081, r24
+    7ae2:	10 92 85 00 	sts	0x0085, r1
+	TCNT1=0;
+    7ae6:	10 92 84 00 	sts	0x0084, r1
+    7aea:	22 e0       	ldi	r18, 0x02	; 2
+	TIMSK1=2; //enable oc1a int
+    7aec:	20 93 6f 00 	sts	0x006F, r18
+    7af0:	80 e4       	ldi	r24, 0x40	; 64
+	OCR1A=40000;  //about 2 seconds at 20KHz
+    7af2:	9c e9       	ldi	r25, 0x9C	; 156
+    7af4:	90 93 89 00 	sts	0x0089, r25
+    7af8:	80 93 88 00 	sts	0x0088, r24
+    7afc:	39 9a       	sbi	0x07, 1	; 7
+	_delay_ms(600);
+	gbaSerInit();
+	midiInit();
+	timeoutInit();
+
+	DDRC|=(1<<PC1);
+    7afe:	41 9a       	sbi	0x08, 1	; 8
+	PORTC|=(1<<PC1);
+    7b00:	35 bf       	out	0x35, r19	; 53
+
+	//Fix int vectors to boot loader range
+	MCUCR=1; MCUCR=2;
+    7b02:	25 bf       	out	0x35, r18	; 53
+    7b04:	78 94       	sei
+
+	//Go wait for flash commands. The timer will take us to userspace if this takes
+	//too long.
+	sei();
+    7b06:	99 24       	eor	r9, r9
+    7b08:	88 24       	eor	r8, r8
+    7b0a:	00 e0       	ldi	r16, 0x00	; 0
+    7b0c:	b3 e0       	ldi	r27, 0x03	; 3
+				unsigned int w;
+				unsigned int pageaddr=(pos*256);
+				while (ppos<256) {
+					cli();
+					eeprom_busy_wait();
+					boot_page_erase(pageaddr);
+    7b0e:	4b 2e       	mov	r4, r27
+    7b10:	3e 01       	movw	r6, r28
+		}
+	}
+}
+
+
+int main(void) {
+    7b12:	08 94       	sec
+    7b14:	61 1c       	adc	r6, r1
+    7b16:	71 1c       	adc	r7, r1
+    7b18:	03 c0       	rjmp	.+6      	; 0x7b20 <main+0x96>
+    7b1a:	08 2d       	mov	r16, r8
+    7b1c:	89 2c       	mov	r8, r9
+    7b1e:	95 2c       	mov	r9, r5
+    7b20:	b4 de       	rcall	.-664    	; 0x788a <midiGetChar>
+	unsigned char hist[4];
+	unsigned char pgmbuff[256];
+	unsigned char cmd;
+	int pos;
+	while(1) {
+		c=midiGetChar();
+    7b22:	58 2e       	mov	r5, r24
+    7b24:	00 3f       	cpi	r16, 0xF0	; 240
+    7b26:	c9 f7       	brne	.-14     	; 0x7b1a <main+0x90>
+
+		hist[0]=hist[1]; hist[1]=hist[2]; hist[2]=hist[3]; hist[3]=c;
+		//Check the GBA fw update sysex command
+		if (hist[0]==0xF0 && hist[1]==0x7D && hist[2]=='G' && hist[3]=='B') {
+    7b28:	28 2d       	mov	r18, r8
+    7b2a:	2d 37       	cpi	r18, 0x7D	; 125
+    7b2c:	b1 f7       	brne	.-20     	; 0x7b1a <main+0x90>
+    7b2e:	89 2d       	mov	r24, r9
+    7b30:	87 34       	cpi	r24, 0x47	; 71
+    7b32:	99 f7       	brne	.-26     	; 0x7b1a <main+0x90>
+    7b34:	e5 2d       	mov	r30, r5
+    7b36:	e2 34       	cpi	r30, 0x42	; 66
+    7b38:	81 f7       	brne	.-32     	; 0x7b1a <main+0x90>
+    7b3a:	a7 de       	rcall	.-690    	; 0x788a <midiGetChar>
+    7b3c:	82 30       	cpi	r24, 0x02	; 2
+			cmd=midiGetChar();
+    7b3e:	31 f4       	brne	.+12     	; 0x7b4c <main+0xc2>
+    7b40:	cd de       	rcall	.-614    	; 0x78dc <timeoutReset>
+			if (cmd==GBA_SYSEX_MK2_ATTN) {
+    7b42:	f1 e0       	ldi	r31, 0x01	; 1
+    7b44:	f0 93 46 01 	sts	0x0146, r31
+				//The midi file for the update is playing.
+				timeoutReset();
+    7b48:	31 9a       	sbi	0x06, 1	; 6
+				canFlash=1;
+    7b4a:	e7 cf       	rjmp	.-50     	; 0x7b1a <main+0x90>
+    7b4c:	83 30       	cpi	r24, 0x03	; 3
+    7b4e:	11 f5       	brne	.+68     	; 0x7b94 <main+0x10a>
+				PINC|=(1<<PC1);
+    7b50:	80 91 46 01 	lds	r24, 0x0146
+			} else if (cmd==GBA_SYSEX_MK2_FILL_BUFF && canFlash) {
+    7b54:	88 23       	and	r24, r24
+    7b56:	09 f3       	breq	.-62     	; 0x7b1a <main+0x90>
+    7b58:	c1 de       	rcall	.-638    	; 0x78dc <timeoutReset>
+    7b5a:	97 de       	rcall	.-722    	; 0x788a <midiGetChar>
+    7b5c:	08 2f       	mov	r16, r24
+    7b5e:	10 e0       	ldi	r17, 0x00	; 0
+				timeoutReset();
+    7b60:	a4 e0       	ldi	r26, 0x04	; 4
+    7b62:	00 0f       	add	r16, r16
+				//Fill the page buffer with some amount of nibbles.
+				pos=midiGetChar()<<4;
+    7b64:	11 1f       	adc	r17, r17
+    7b66:	aa 95       	dec	r26
+    7b68:	e1 f7       	brne	.-8      	; 0x7b62 <main+0xd8>
+    7b6a:	8f de       	rcall	.-738    	; 0x788a <midiGetChar>
+    7b6c:	90 e0       	ldi	r25, 0x00	; 0
+    7b6e:	08 2b       	or	r16, r24
+    7b70:	19 2b       	or	r17, r25
+    7b72:	06 0d       	add	r16, r6
+    7b74:	17 1d       	adc	r17, r7
+				pos|=midiGetChar();
+    7b76:	89 de       	rcall	.-750    	; 0x788a <midiGetChar>
+    7b78:	e8 2e       	mov	r14, r24
+    7b7a:	87 fd       	sbrc	r24, 7
+    7b7c:	ce cf       	rjmp	.-100    	; 0x7b1a <main+0x90>
+    7b7e:	85 de       	rcall	.-758    	; 0x788a <midiGetChar>
+		}
+	}
+}
+
+
+int main(void) {
+    7b80:	87 fd       	sbrc	r24, 7
+    7b82:	cb cf       	rjmp	.-106    	; 0x7b1a <main+0x90>
+				timeoutReset();
+				//Fill the page buffer with some amount of nibbles.
+				pos=midiGetChar()<<4;
+				pos|=midiGetChar();
+				while (1) {
+					c=midiGetChar();
+    7b84:	e2 94       	swap	r14
+    7b86:	f0 ef       	ldi	r31, 0xF0	; 240
+    7b88:	ef 22       	and	r14, r31
+					if (c&0x80) break;
+    7b8a:	e8 2a       	or	r14, r24
+    7b8c:	f8 01       	movw	r30, r16
+					b=(c<<4);
+					c=midiGetChar();
+    7b8e:	e1 92       	st	Z+, r14
+    7b90:	8f 01       	movw	r16, r30
+					if (c&0x80) break;
+    7b92:	f1 cf       	rjmp	.-30     	; 0x7b76 <main+0xec>
+    7b94:	84 30       	cpi	r24, 0x04	; 4
+				pos=midiGetChar()<<4;
+				pos|=midiGetChar();
+				while (1) {
+					c=midiGetChar();
+					if (c&0x80) break;
+					b=(c<<4);
+    7b96:	09 f0       	breq	.+2      	; 0x7b9a <main+0x110>
+    7b98:	56 c0       	rjmp	.+172    	; 0x7c46 <main+0x1bc>
+    7b9a:	80 91 46 01 	lds	r24, 0x0146
+					c=midiGetChar();
+					if (c&0x80) break;
+					b|=c;
+					pgmbuff[pos++]=b;
+    7b9e:	88 23       	and	r24, r24
+    7ba0:	09 f4       	brne	.+2      	; 0x7ba4 <main+0x11a>
+    7ba2:	bb cf       	rjmp	.-138    	; 0x7b1a <main+0x90>
+    7ba4:	9b de       	rcall	.-714    	; 0x78dc <timeoutReset>
+				}
+			} else if (cmd==GBA_SYSEX_MK2_PGM_PAGE && canFlash) {
+    7ba6:	71 de       	rcall	.-798    	; 0x788a <midiGetChar>
+    7ba8:	e8 2e       	mov	r14, r24
+    7baa:	ff 24       	eor	r15, r15
+    7bac:	e4 e0       	ldi	r30, 0x04	; 4
+    7bae:	ee 0c       	add	r14, r14
+    7bb0:	ff 1c       	adc	r15, r15
+    7bb2:	ea 95       	dec	r30
+    7bb4:	e1 f7       	brne	.-8      	; 0x7bae <main+0x124>
+				timeoutReset();
+    7bb6:	69 de       	rcall	.-814    	; 0x788a <midiGetChar>
+    7bb8:	90 e0       	ldi	r25, 0x00	; 0
+				//Program the page into the AVRs memory
+				pos=midiGetChar()<<4;
+    7bba:	8e 29       	or	r24, r14
+    7bbc:	9f 29       	or	r25, r15
+    7bbe:	18 2f       	mov	r17, r24
+    7bc0:	00 27       	eor	r16, r16
+    7bc2:	80 e0       	ldi	r24, 0x00	; 0
+    7bc4:	90 e0       	ldi	r25, 0x00	; 0
+    7bc6:	ac 01       	movw	r20, r24
+    7bc8:	40 0f       	add	r20, r16
+    7bca:	51 1f       	adc	r21, r17
+				pos|=midiGetChar();
+    7bcc:	f8 94       	cli
+    7bce:	f9 99       	sbic	0x1f, 1	; 31
+    7bd0:	fe cf       	rjmp	.-4      	; 0x7bce <main+0x144>
+    7bd2:	fa 01       	movw	r30, r20
+    7bd4:	40 92 57 00 	sts	0x0057, r4
+				int ppos=0;
+				int x;
+				unsigned int w;
+				unsigned int pageaddr=(pos*256);
+    7bd8:	e8 95       	spm
+			} else if (cmd==GBA_SYSEX_MK2_PGM_PAGE && canFlash) {
+				timeoutReset();
+				//Program the page into the AVRs memory
+				pos=midiGetChar()<<4;
+				pos|=midiGetChar();
+				int ppos=0;
+    7bda:	07 b6       	in	r0, 0x37	; 55
+    7bdc:	00 fc       	sbrc	r0, 0
+				int x;
+				unsigned int w;
+				unsigned int pageaddr=(pos*256);
+    7bde:	fd cf       	rjmp	.-6      	; 0x7bda <main+0x150>
+    7be0:	d3 01       	movw	r26, r6
+    7be2:	a8 0f       	add	r26, r24
+				while (ppos<256) {
+					cli();
+    7be4:	b9 1f       	adc	r27, r25
+					eeprom_busy_wait();
+    7be6:	20 e0       	ldi	r18, 0x00	; 0
+    7be8:	30 e0       	ldi	r19, 0x00	; 0
+					boot_page_erase(pageaddr);
+    7bea:	6c 91       	ld	r22, X
+    7bec:	70 e0       	ldi	r23, 0x00	; 0
+    7bee:	f9 01       	movw	r30, r18
+    7bf0:	e4 0f       	add	r30, r20
+					boot_spm_busy_wait();
+    7bf2:	f5 1f       	adc	r31, r21
+    7bf4:	11 96       	adiw	r26, 0x01	; 1
+    7bf6:	3c 90       	ld	r3, X
+		}
+	}
+}
+
+
+int main(void) {
+    7bf8:	11 97       	sbiw	r26, 0x01	; 1
+    7bfa:	22 24       	eor	r2, r2
+    7bfc:	62 29       	or	r22, r2
+    7bfe:	73 29       	or	r23, r3
+    7c00:	ff 24       	eor	r15, r15
+					cli();
+					eeprom_busy_wait();
+					boot_page_erase(pageaddr);
+					boot_spm_busy_wait();
+					for (x=0; x<SPM_PAGESIZE; x+=2) {
+						w=pgmbuff[ppos++];
+    7c02:	f3 94       	inc	r15
+    7c04:	0b 01       	movw	r0, r22
+						w|=pgmbuff[ppos++]<<8;
+						boot_page_fill(pageaddr+x, w);
+    7c06:	f0 92 57 00 	sts	0x0057, r15
+    7c0a:	e8 95       	spm
+					eeprom_busy_wait();
+					boot_page_erase(pageaddr);
+					boot_spm_busy_wait();
+					for (x=0; x<SPM_PAGESIZE; x+=2) {
+						w=pgmbuff[ppos++];
+						w|=pgmbuff[ppos++]<<8;
+    7c0c:	11 24       	eor	r1, r1
+    7c0e:	2e 5f       	subi	r18, 0xFE	; 254
+    7c10:	3f 4f       	sbci	r19, 0xFF	; 255
+    7c12:	12 96       	adiw	r26, 0x02	; 2
+    7c14:	20 38       	cpi	r18, 0x80	; 128
+    7c16:	31 05       	cpc	r19, r1
+						boot_page_fill(pageaddr+x, w);
+    7c18:	41 f7       	brne	.-48     	; 0x7bea <main+0x160>
+    7c1a:	80 58       	subi	r24, 0x80	; 128
+    7c1c:	9f 4f       	sbci	r25, 0xFF	; 255
+    7c1e:	65 e0       	ldi	r22, 0x05	; 5
+    7c20:	f6 2e       	mov	r15, r22
+    7c22:	fa 01       	movw	r30, r20
+    7c24:	f0 92 57 00 	sts	0x0057, r15
+				while (ppos<256) {
+					cli();
+					eeprom_busy_wait();
+					boot_page_erase(pageaddr);
+					boot_spm_busy_wait();
+					for (x=0; x<SPM_PAGESIZE; x+=2) {
+    7c28:	e8 95       	spm
+    7c2a:	07 b6       	in	r0, 0x37	; 55
+    7c2c:	00 fc       	sbrc	r0, 0
+    7c2e:	fd cf       	rjmp	.-6      	; 0x7c2a <main+0x1a0>
+    7c30:	78 94       	sei
+    7c32:	21 e0       	ldi	r18, 0x01	; 1
+    7c34:	80 30       	cpi	r24, 0x00	; 0
+						w=pgmbuff[ppos++];
+						w|=pgmbuff[ppos++]<<8;
+						boot_page_fill(pageaddr+x, w);
+					}
+					boot_page_write(pageaddr);
+    7c36:	92 07       	cpc	r25, r18
+    7c38:	09 f0       	breq	.+2      	; 0x7c3c <main+0x1b2>
+    7c3a:	c5 cf       	rjmp	.-118    	; 0x7bc6 <main+0x13c>
+    7c3c:	81 e1       	ldi	r24, 0x11	; 17
+    7c3e:	80 93 57 00 	sts	0x0057, r24
+					boot_spm_busy_wait();
+    7c42:	e8 95       	spm
+    7c44:	6a cf       	rjmp	.-300    	; 0x7b1a <main+0x90>
+    7c46:	85 30       	cpi	r24, 0x05	; 5
+					pageaddr+=SPM_PAGESIZE;
+					sei();
+    7c48:	09 f0       	breq	.+2      	; 0x7c4c <main+0x1c2>
+				pos|=midiGetChar();
+				int ppos=0;
+				int x;
+				unsigned int w;
+				unsigned int pageaddr=(pos*256);
+				while (ppos<256) {
+    7c4a:	67 cf       	rjmp	.-306    	; 0x7b1a <main+0x90>
+    7c4c:	80 91 46 01 	lds	r24, 0x0146
+    7c50:	88 23       	and	r24, r24
+    7c52:	09 f4       	brne	.+2      	; 0x7c56 <main+0x1cc>
+					boot_page_write(pageaddr);
+					boot_spm_busy_wait();
+					pageaddr+=SPM_PAGESIZE;
+					sei();
+				}
+				boot_rww_enable();
+    7c54:	62 cf       	rjmp	.-316    	; 0x7b1a <main+0x90>
+    7c56:	04 e0       	ldi	r16, 0x04	; 4
+    7c58:	10 e0       	ldi	r17, 0x00	; 0
+    7c5a:	ee 24       	eor	r14, r14
+    7c5c:	ff 24       	eor	r15, r15
+			} else if (cmd==GBA_SYSEX_MK2_METADATA && canFlash) {
+    7c5e:	67 01       	movw	r12, r14
+    7c60:	44 e0       	ldi	r20, 0x04	; 4
+    7c62:	cc 0c       	add	r12, r12
+    7c64:	dd 1c       	adc	r13, r13
+    7c66:	4a 95       	dec	r20
+    7c68:	e1 f7       	brne	.-8      	; 0x7c62 <main+0x1d8>
+    7c6a:	0f de       	rcall	.-994    	; 0x788a <midiGetChar>
+    7c6c:	e8 2e       	mov	r14, r24
+    7c6e:	ff 24       	eor	r15, r15
+    7c70:	ec 28       	or	r14, r12
+    7c72:	fd 28       	or	r15, r13
+    7c74:	01 50       	subi	r16, 0x01	; 1
+				unsigned int len=0;
+				unsigned int chsum=0;
+				int x;
+				for (x=0; x<4; x++) len=(len<<4)|midiGetChar();
+    7c76:	10 40       	sbci	r17, 0x00	; 0
+    7c78:	91 f7       	brne	.-28     	; 0x7c5e <main+0x1d4>
+    7c7a:	34 e0       	ldi	r19, 0x04	; 4
+    7c7c:	c3 2e       	mov	r12, r19
+    7c7e:	d1 2c       	mov	r13, r1
+    7c80:	00 e0       	ldi	r16, 0x00	; 0
+    7c82:	10 e0       	ldi	r17, 0x00	; 0
+    7c84:	58 01       	movw	r10, r16
+    7c86:	24 e0       	ldi	r18, 0x04	; 4
+    7c88:	aa 0c       	add	r10, r10
+    7c8a:	bb 1c       	adc	r11, r11
+    7c8c:	2a 95       	dec	r18
+    7c8e:	e1 f7       	brne	.-8      	; 0x7c88 <main+0x1fe>
+    7c90:	fc dd       	rcall	.-1032   	; 0x788a <midiGetChar>
+    7c92:	08 2f       	mov	r16, r24
+    7c94:	10 e0       	ldi	r17, 0x00	; 0
+    7c96:	0a 29       	or	r16, r10
+    7c98:	1b 29       	or	r17, r11
+    7c9a:	08 94       	sec
+    7c9c:	c1 08       	sbc	r12, r1
+				for (x=0; x<4; x++) chsum=(chsum<<4)|midiGetChar();
+    7c9e:	d1 08       	sbc	r13, r1
+    7ca0:	c1 14       	cp	r12, r1
+    7ca2:	d1 04       	cpc	r13, r1
+    7ca4:	79 f7       	brne	.-34     	; 0x7c84 <main+0x1fa>
+    7ca6:	8c ef       	ldi	r24, 0xFC	; 252
+    7ca8:	93 e0       	ldi	r25, 0x03	; 3
+    7caa:	b7 01       	movw	r22, r14
+    7cac:	e8 d0       	rcall	.+464    	; 0x7e7e <__eewr_word_m328>
+    7cae:	8e ef       	ldi	r24, 0xFE	; 254
+    7cb0:	93 e0       	ldi	r25, 0x03	; 3
+    7cb2:	b8 01       	movw	r22, r16
+    7cb4:	e4 d0       	rcall	.+456    	; 0x7e7e <__eewr_word_m328>
+    7cb6:	af de       	rcall	.-674    	; 0x7a16 <payloadCheck>
+    7cb8:	88 23       	and	r24, r24
+    7cba:	09 f4       	brne	.+2      	; 0x7cbe <main+0x234>
+    7cbc:	2e cf       	rjmp	.-420    	; 0x7b1a <main+0x90>
+    7cbe:	92 de       	rcall	.-732    	; 0x79e4 <payloadBoot>
+    7cc0:	2c cf       	rjmp	.-424    	; 0x7b1a <main+0x90>
+
+00007cc2 <__vector_18>:
+
+//Yes, everything has to be really, really volatile :)
+volatile char midiInBuff[BUFSZ+1];
+volatile char * volatile wpos, * volatile rpos;
+
+ISR(USART_RX_vect) {
+    7cc2:	1f 92       	push	r1
+    7cc4:	0f 92       	push	r0
+    7cc6:	0f b6       	in	r0, 0x3f	; 63
+    7cc8:	0f 92       	push	r0
+    7cca:	11 24       	eor	r1, r1
+    7ccc:	2f 93       	push	r18
+    7cce:	8f 93       	push	r24
+    7cd0:	9f 93       	push	r25
+    7cd2:	ef 93       	push	r30
+    7cd4:	ff 93       	push	r31
+	*wpos=UDR0;
+    7cd6:	e0 91 40 01 	lds	r30, 0x0140
+    7cda:	f0 91 41 01 	lds	r31, 0x0141
+    7cde:	80 91 c6 00 	lds	r24, 0x00C6
+    7ce2:	80 83       	st	Z, r24
+	wpos++;
+    7ce4:	80 91 40 01 	lds	r24, 0x0140
+    7ce8:	90 91 41 01 	lds	r25, 0x0141
+    7cec:	01 96       	adiw	r24, 0x01	; 1
+    7cee:	90 93 41 01 	sts	0x0141, r25
+    7cf2:	80 93 40 01 	sts	0x0140, r24
+	if (wpos>=midiInBuff+BUFSZ) wpos=midiInBuff;
+    7cf6:	80 91 40 01 	lds	r24, 0x0140
+    7cfa:	90 91 41 01 	lds	r25, 0x0141
+    7cfe:	21 e0       	ldi	r18, 0x01	; 1
+    7d00:	8f 33       	cpi	r24, 0x3F	; 63
+    7d02:	92 07       	cpc	r25, r18
+    7d04:	30 f0       	brcs	.+12     	; 0x7d12 <__vector_18+0x50>
+    7d06:	80 e0       	ldi	r24, 0x00	; 0
+    7d08:	91 e0       	ldi	r25, 0x01	; 1
+    7d0a:	90 93 41 01 	sts	0x0141, r25
+    7d0e:	80 93 40 01 	sts	0x0140, r24
+}
+    7d12:	ff 91       	pop	r31
+    7d14:	ef 91       	pop	r30
+    7d16:	9f 91       	pop	r25
+    7d18:	8f 91       	pop	r24
+    7d1a:	2f 91       	pop	r18
+    7d1c:	0f 90       	pop	r0
+    7d1e:	0f be       	out	0x3f, r0	; 63
+    7d20:	0f 90       	pop	r0
+    7d22:	1f 90       	pop	r1
+    7d24:	18 95       	reti
+
+00007d26 <__vector_11>:
+#include <avr/io.h>
+#include <avr/interrupt.h>
+#include "payload.h"
+#include "errorlogo.h"
+
+ISR(TIMER1_COMPA_vect) {
+    7d26:	1f 92       	push	r1
+    7d28:	0f 92       	push	r0
+    7d2a:	0f b6       	in	r0, 0x3f	; 63
+    7d2c:	0f 92       	push	r0
+    7d2e:	11 24       	eor	r1, r1
+    7d30:	0f 93       	push	r16
+    7d32:	1f 93       	push	r17
+    7d34:	2f 93       	push	r18
+    7d36:	3f 93       	push	r19
+    7d38:	4f 93       	push	r20
+    7d3a:	5f 93       	push	r21
+    7d3c:	6f 93       	push	r22
+    7d3e:	7f 93       	push	r23
+    7d40:	8f 93       	push	r24
+    7d42:	9f 93       	push	r25
+    7d44:	af 93       	push	r26
+    7d46:	bf 93       	push	r27
+    7d48:	cf 93       	push	r28
+    7d4a:	df 93       	push	r29
+    7d4c:	ef 93       	push	r30
+    7d4e:	ff 93       	push	r31
+	if (payloadCheck()) payloadBoot();
+    7d50:	62 de       	rcall	.-828    	; 0x7a16 <payloadCheck>
+    7d52:	88 23       	and	r24, r24
+    7d54:	09 f0       	breq	.+2      	; 0x7d58 <__vector_11+0x32>
+    7d56:	46 de       	rcall	.-884    	; 0x79e4 <payloadBoot>
+    7d58:	ce e1       	ldi	r28, 0x1E	; 30
+    7d5a:	d0 e0       	ldi	r29, 0x00	; 0
+#include <avr/io.h>
+#include <avr/interrupt.h>
+#include "payload.h"
+#include "errorlogo.h"
+
+ISR(TIMER1_COMPA_vect) {
+    7d5c:	04 ef       	ldi	r16, 0xF4	; 244
+    7d5e:	11 e0       	ldi	r17, 0x01	; 1
+    7d60:	84 ef       	ldi	r24, 0xF4	; 244
+    7d62:	91 e0       	ldi	r25, 0x01	; 1
+    7d64:	f8 01       	movw	r30, r16
+    7d66:	31 97       	sbiw	r30, 0x01	; 1
+    7d68:	f1 f7       	brne	.-4      	; 0x7d66 <__vector_11+0x40>
+    7d6a:	01 97       	sbiw	r24, 0x01	; 1
+    7d6c:	d9 f7       	brne	.-10     	; 0x7d64 <__vector_11+0x3e>
+    7d6e:	82 e0       	ldi	r24, 0x02	; 2
+    7d70:	92 e6       	ldi	r25, 0x62	; 98
+
+	//Wait for GBA
+	timeout=30;
+	do {
+		_delay_ms(50);
+		rd=gbaSerXfer(0x6202);
+    7d72:	c0 dd       	rcall	.-1152   	; 0x78f4 <gbaSerXfer>
+    7d74:	22 e7       	ldi	r18, 0x72	; 114
+    7d76:	82 30       	cpi	r24, 0x02	; 2
+    7d78:	92 07       	cpc	r25, r18
+		timeout--;
+	} while (rd!=0x7202 && timeout>0);
+    7d7a:	11 f0       	breq	.+4      	; 0x7d80 <__vector_11+0x5a>
+    7d7c:	21 97       	sbiw	r28, 0x01	; 1
+    7d7e:	81 f7       	brne	.-32     	; 0x7d60 <__vector_11+0x3a>
+    7d80:	80 e0       	ldi	r24, 0x00	; 0
+    7d82:	91 e6       	ldi	r25, 0x61	; 97
+    7d84:	b7 dd       	rcall	.-1170   	; 0x78f4 <gbaSerXfer>
+
+	//Send 'header', unencrypted.
+	rd=gbaSerXfer(0x6100);
+    7d86:	c0 e0       	ldi	r28, 0x00	; 0
+    7d88:	d0 e0       	ldi	r29, 0x00	; 0
+    7d8a:	ca 30       	cpi	r28, 0x0A	; 10
+    7d8c:	d1 05       	cpc	r29, r1
+	for (i=0; i<0x60; i++) {
+    7d8e:	1c f4       	brge	.+6      	; 0x7d96 <__vector_11+0x70>
+    7d90:	80 e0       	ldi	r24, 0x00	; 0
+		rd=gbaSerXfer(i<10?0:0xFFFF);
+    7d92:	90 e0       	ldi	r25, 0x00	; 0
+    7d94:	02 c0       	rjmp	.+4      	; 0x7d9a <__vector_11+0x74>
+    7d96:	8f ef       	ldi	r24, 0xFF	; 255
+    7d98:	9f ef       	ldi	r25, 0xFF	; 255
+    7d9a:	ac dd       	rcall	.-1192   	; 0x78f4 <gbaSerXfer>
+    7d9c:	21 96       	adiw	r28, 0x01	; 1
+    7d9e:	c0 36       	cpi	r28, 0x60	; 96
+    7da0:	d1 05       	cpc	r29, r1
+    7da2:	99 f7       	brne	.-26     	; 0x7d8a <__vector_11+0x64>
+    7da4:	82 e0       	ldi	r24, 0x02	; 2
+		timeout--;
+	} while (rd!=0x7202 && timeout>0);
+
+	//Send 'header', unencrypted.
+	rd=gbaSerXfer(0x6100);
+	for (i=0; i<0x60; i++) {
+    7da6:	92 e6       	ldi	r25, 0x62	; 98
+    7da8:	a5 dd       	rcall	.-1206   	; 0x78f4 <gbaSerXfer>
+    7daa:	81 ec       	ldi	r24, 0xC1	; 193
+    7dac:	93 e6       	ldi	r25, 0x63	; 99
+		rd=gbaSerXfer(i<10?0:0xFFFF);
+	}
+	//Command: get encryption value
+	gbaSerXfer(0x6202);
+    7dae:	a2 dd       	rcall	.-1212   	; 0x78f4 <gbaSerXfer>
+    7db0:	81 ec       	ldi	r24, 0xC1	; 193
+    7db2:	93 e6       	ldi	r25, 0x63	; 99
+    7db4:	9f dd       	rcall	.-1218   	; 0x78f4 <gbaSerXfer>
+	gbaSerXfer(0x63C1);
+    7db6:	81 5f       	subi	r24, 0xF1	; 241
+    7db8:	90 e0       	ldi	r25, 0x00	; 0
+    7dba:	94 66       	ori	r25, 0x64	; 100
+    7dbc:	9b dd       	rcall	.-1226   	; 0x78f4 <gbaSerXfer>
+	rd=gbaSerXfer(0x63C1);
+    7dbe:	86 e9       	ldi	r24, 0x96	; 150
+    7dc0:	90 e0       	ldi	r25, 0x00	; 0
+    7dc2:	98 dd       	rcall	.-1232   	; 0x78f4 <gbaSerXfer>
+    7dc4:	c4 e6       	ldi	r28, 0x64	; 100
+
+	var1=((rd&0xFF)+0x20F)&0xff;
+    7dc6:	d0 e0       	ldi	r29, 0x00	; 0
+    7dc8:	8f ef       	ldi	r24, 0xFF	; 255
+	conf=var1|0x6400L;
+	rd=gbaSerXfer(conf);
+    7dca:	9f ef       	ldi	r25, 0xFF	; 255
+    7dcc:	93 dd       	rcall	.-1242   	; 0x78f4 <gbaSerXfer>
+    7dce:	21 97       	sbiw	r28, 0x01	; 1
+
+	//Send length.
+	len=((1000-0xC0L)>>2)-0x34L;
+	var8=gbaSerXfer(len);
+    7dd0:	d9 f7       	brne	.-10     	; 0x7dc8 <__vector_11+0xa2>
+    7dd2:	80 91 6f 00 	lds	r24, 0x006F
+    7dd6:	8d 7f       	andi	r24, 0xFD	; 253
+    7dd8:	80 93 6f 00 	sts	0x006F, r24
+
+	for (i=0; i<100; i++) {
+		var8=gbaSerXfer(0xffff);
+    7ddc:	ff 91       	pop	r31
+    7dde:	ef 91       	pop	r30
+    7de0:	df 91       	pop	r29
+    7de2:	cf 91       	pop	r28
+    7de4:	bf 91       	pop	r27
+    7de6:	af 91       	pop	r26
+	if (payloadCheck()) payloadBoot();
+	//show error logo
+	setBlackLogo();
+	//Kill this int so the device will stay in bootloader mode
+	TIMSK1&=~(2); //disable oc1a int
+    7de8:	9f 91       	pop	r25
+    7dea:	8f 91       	pop	r24
+    7dec:	7f 91       	pop	r23
+    7dee:	6f 91       	pop	r22
+    7df0:	5f 91       	pop	r21
+}
+    7df2:	4f 91       	pop	r20
+    7df4:	3f 91       	pop	r19
+    7df6:	2f 91       	pop	r18
+    7df8:	1f 91       	pop	r17
+    7dfa:	0f 91       	pop	r16
+    7dfc:	0f 90       	pop	r0
+    7dfe:	0f be       	out	0x3f, r0	; 63
+    7e00:	0f 90       	pop	r0
+    7e02:	1f 90       	pop	r1
+    7e04:	18 95       	reti
+
+00007e06 <__prologue_saves__>:
+    7e06:	2f 92       	push	r2
+    7e08:	3f 92       	push	r3
+    7e0a:	4f 92       	push	r4
+    7e0c:	5f 92       	push	r5
+    7e0e:	6f 92       	push	r6
+    7e10:	7f 92       	push	r7
+    7e12:	8f 92       	push	r8
+    7e14:	9f 92       	push	r9
+    7e16:	af 92       	push	r10
+    7e18:	bf 92       	push	r11
+    7e1a:	cf 92       	push	r12
+    7e1c:	df 92       	push	r13
+    7e1e:	ef 92       	push	r14
+    7e20:	ff 92       	push	r15
+    7e22:	0f 93       	push	r16
+    7e24:	1f 93       	push	r17
+    7e26:	cf 93       	push	r28
+    7e28:	df 93       	push	r29
+    7e2a:	cd b7       	in	r28, 0x3d	; 61
+    7e2c:	de b7       	in	r29, 0x3e	; 62
+    7e2e:	ca 1b       	sub	r28, r26
+    7e30:	db 0b       	sbc	r29, r27
+    7e32:	0f b6       	in	r0, 0x3f	; 63
+    7e34:	f8 94       	cli
+    7e36:	de bf       	out	0x3e, r29	; 62
+    7e38:	0f be       	out	0x3f, r0	; 63
+    7e3a:	cd bf       	out	0x3d, r28	; 61
+    7e3c:	09 94       	ijmp
+
+00007e3e <__epilogue_restores__>:
+    7e3e:	2a 88       	ldd	r2, Y+18	; 0x12
+    7e40:	39 88       	ldd	r3, Y+17	; 0x11
+    7e42:	48 88       	ldd	r4, Y+16	; 0x10
+    7e44:	5f 84       	ldd	r5, Y+15	; 0x0f
+    7e46:	6e 84       	ldd	r6, Y+14	; 0x0e
+    7e48:	7d 84       	ldd	r7, Y+13	; 0x0d
+    7e4a:	8c 84       	ldd	r8, Y+12	; 0x0c
+    7e4c:	9b 84       	ldd	r9, Y+11	; 0x0b
+    7e4e:	aa 84       	ldd	r10, Y+10	; 0x0a
+    7e50:	b9 84       	ldd	r11, Y+9	; 0x09
+    7e52:	c8 84       	ldd	r12, Y+8	; 0x08
+    7e54:	df 80       	ldd	r13, Y+7	; 0x07
+    7e56:	ee 80       	ldd	r14, Y+6	; 0x06
+    7e58:	fd 80       	ldd	r15, Y+5	; 0x05
+    7e5a:	0c 81       	ldd	r16, Y+4	; 0x04
+    7e5c:	1b 81       	ldd	r17, Y+3	; 0x03
+    7e5e:	aa 81       	ldd	r26, Y+2	; 0x02
+    7e60:	b9 81       	ldd	r27, Y+1	; 0x01
+    7e62:	ce 0f       	add	r28, r30
+    7e64:	d1 1d       	adc	r29, r1
+    7e66:	0f b6       	in	r0, 0x3f	; 63
+    7e68:	f8 94       	cli
+    7e6a:	de bf       	out	0x3e, r29	; 62
+    7e6c:	0f be       	out	0x3f, r0	; 63
+    7e6e:	cd bf       	out	0x3d, r28	; 61
+    7e70:	ed 01       	movw	r28, r26
+    7e72:	08 95       	ret
+
+00007e74 <__eerd_word_m328>:
+    7e74:	a8 e1       	ldi	r26, 0x18	; 24
+    7e76:	b0 e0       	ldi	r27, 0x00	; 0
+    7e78:	42 e0       	ldi	r20, 0x02	; 2
+    7e7a:	50 e0       	ldi	r21, 0x00	; 0
+    7e7c:	05 c0       	rjmp	.+10     	; 0x7e88 <__eerd_blraw_m328>
+
+00007e7e <__eewr_word_m328>:
+    7e7e:	12 d0       	rcall	.+36     	; 0x7ea4 <__eewr_byte_m328>
+    7e80:	27 2f       	mov	r18, r23
+    7e82:	11 c0       	rjmp	.+34     	; 0x7ea6 <__eewr_r18_m328>
+
+00007e84 <__eerd_block_m328>:
+    7e84:	dc 01       	movw	r26, r24
+    7e86:	cb 01       	movw	r24, r22
+
+00007e88 <__eerd_blraw_m328>:
+    7e88:	fc 01       	movw	r30, r24
+    7e8a:	f9 99       	sbic	0x1f, 1	; 31
+    7e8c:	fe cf       	rjmp	.-4      	; 0x7e8a <__eerd_blraw_m328+0x2>
+    7e8e:	06 c0       	rjmp	.+12     	; 0x7e9c <__eerd_blraw_m328+0x14>
+    7e90:	f2 bd       	out	0x22, r31	; 34
+    7e92:	e1 bd       	out	0x21, r30	; 33
+    7e94:	f8 9a       	sbi	0x1f, 0	; 31
+    7e96:	31 96       	adiw	r30, 0x01	; 1
+    7e98:	00 b4       	in	r0, 0x20	; 32
+    7e9a:	0d 92       	st	X+, r0
+    7e9c:	41 50       	subi	r20, 0x01	; 1
+    7e9e:	50 40       	sbci	r21, 0x00	; 0
+    7ea0:	b8 f7       	brcc	.-18     	; 0x7e90 <__eerd_blraw_m328+0x8>
+    7ea2:	08 95       	ret
+
+00007ea4 <__eewr_byte_m328>:
+    7ea4:	26 2f       	mov	r18, r22
+
+00007ea6 <__eewr_r18_m328>:
+    7ea6:	f9 99       	sbic	0x1f, 1	; 31
+    7ea8:	fe cf       	rjmp	.-4      	; 0x7ea6 <__eewr_r18_m328>
+    7eaa:	1f ba       	out	0x1f, r1	; 31
+    7eac:	92 bd       	out	0x22, r25	; 34
+    7eae:	81 bd       	out	0x21, r24	; 33
+    7eb0:	20 bd       	out	0x20, r18	; 32
+    7eb2:	0f b6       	in	r0, 0x3f	; 63
+    7eb4:	f8 94       	cli
+    7eb6:	fa 9a       	sbi	0x1f, 2	; 31
+    7eb8:	f9 9a       	sbi	0x1f, 1	; 31
+    7eba:	0f be       	out	0x3f, r0	; 63
+    7ebc:	01 96       	adiw	r24, 0x01	; 1
+    7ebe:	08 95       	ret
+
+00007ec0 <_exit>:
+    7ec0:	f8 94       	cli
+
+00007ec2 <__stop_program>:
+    7ec2:	ff cf       	rjmp	.-2      	; 0x7ec2 <__stop_program>

@@ -1,2 +1,2 @@
-unsigned char midiGetChar(void);
+int midiGetChar(void);
 void midiInit(void);

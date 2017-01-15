@@ -22,7 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #define UBRVAL 39 //20MHz -> 31.25KBit.
 
-#define BUFSZ 31
+#define BUFSZ 32
 
 //Yes, everything has to be really, really volatile :)
 volatile char midiInBuff[BUFSZ];
@@ -34,9 +34,11 @@ ISR(USART_RX_vect) {
 	if (wpos>=midiInBuff+BUFSZ) wpos=midiInBuff;
 }
 
-unsigned char midiGetChar(void) {
+int midiGetChar(void) {
 	unsigned char ret;
-	while (wpos==rpos) ;
+
+	if (wpos==rpos) return -1;
+
 	ret=*rpos;
 	rpos++;
 	if (rpos>=midiInBuff+BUFSZ) rpos=midiInBuff;
@@ -46,7 +48,7 @@ unsigned char midiGetChar(void) {
 void midiInit(void) {
 	wpos=midiInBuff;
 	rpos=midiInBuff;
-    UCSR0B=0x98;
-    UBRR0L=UBRVAL&0xff;
-    UBRR0H=UBRVAL>>8;
+	UCSR0B=0x98;
+	UBRR0L=UBRVAL&0xff;
+	UBRR0H=UBRVAL>>8;
 }

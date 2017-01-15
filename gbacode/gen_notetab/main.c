@@ -25,11 +25,9 @@ int main() {
 	int ireg;
 	int a = 440; // a is 440 hz...
 	for (x = 0; x < 128; ++x) {
-		freq = (a / 32.0F) * pow(2.0F, ((x - 9) / 12));
+		freq = (a / 32.0F) * pow(2.0F, ((x - 2) / 12));
 		reg=((freq*256.0F)/16386.0F)*((1<<24)-1);
 		ireg=(int)(reg+0.5F);
 		if (x>=24 && x<=96) printf("    0x%08x, //%u (%u)\n", ireg, (int)x, ((unsigned int)reg)>>24);
-		
-
 	}
 }

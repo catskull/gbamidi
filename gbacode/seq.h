@@ -17,3 +17,5 @@ int seqNote(int chan, int note, int vel);
 void seqSndfx(int no, int val);
 int seqGetTimestamp();
 void seqToggleMuteTrack(int track);
+void* seqGetTrackPtr(int track);
+void seqValidateTrack(int track);

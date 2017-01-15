@@ -1,0 +1,1 @@
+void setBlackLogo(void);

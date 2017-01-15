@@ -20,12 +20,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 The main sound code.
 Apologies for the massive amount of spaghetti-logic here, it sortta grew this way
 and is a bit too intermingled to easily split up into multiple files. (Or maybe
-not; anyway I don't really feel like refactoring it.)
+not; actually I don't really feel like refactoring it.)
 */
+
 #include "gba.h"
 #include "midinotefreq.h"
 #include "sound.h"
 #include "seq.h"
+#include "nvmem.h"
+#include "serial.h"
 
 #define MAXNOTES 8
 
@@ -258,6 +261,12 @@ static void soundReset() {
 		SNDFX_SEQ_AUTOPCT, 127,
 		SNDFX_SEQ_BSPLIT, 0,
 		SNDFX_SEQ_BOFF, 20,
+		SNDFX_PAN_CH1, 64,
+		SNDFX_PAN_CH2, 64,
+		SNDFX_PAN_CH3, 64,
+		SNDFX_PAN_CH4, 64,
+		SNDFX_PAN_CH10, 64,
+		SNDFX_SAMPR, 0,
 		0,0
 	};
 
@@ -359,6 +368,13 @@ const static int midiPlusPitchToNoise(int note, int pitch) {
 	return m|(n<<4);
 }
 
+void setPan(int ch, int value) {
+	int lb, rb;
+	rb=8+(ch-1);
+	lb=12+(ch-1);
+	if (value>85) REG_SOUNDCNT_L&=~(1<<lb); else REG_SOUNDCNT_L|=(1<<lb);
+	if (value<43) REG_SOUNDCNT_L&=~(1<<rb); else REG_SOUNDCNT_L|=(1<<rb);
+}
 
 static void soundSetEffectHw(int effectNo, int value) {
 	if (effectNo==SNDFX_DUTYCYCLE) {
@@ -441,10 +457,10 @@ static void soundSetEffectHw(int effectNo, int value) {
 		if (value<=0) {
 			value=value+64;
 			if (value==64) value=0;
-			sndChanReg[0].l=(sndChanReg[0].l&0x7)|((value>>3)<<4)|0x8;
+			sndChanReg[0].l=(sndChanReg[0].l&0xF)|((value>>3)<<4)|0x8;
 		} else {
 			value=64-value;
-			sndChanReg[0].l=(sndChanReg[0].l&0x7)|((value>>3)<<4);
+			sndChanReg[0].l=(sndChanReg[0].l&0xF)|((value>>3)<<4);
 		}
 	} else if (effectNo==SNDFX_SWEEP_PITCH && sweepChanInUse) {
 		updateGbChannelParams(0, 0);
@@ -499,6 +515,22 @@ static void soundSetEffectHw(int effectNo, int value) {
 		} else {
 			seqTicklen=0;
 		}
+	} else if (effectNo==SNDFX_PAN_CH1) {
+		if (!sweepChanInUse) setPan(1, value);
+		setPan(2, value);
+	} else if (effectNo==SNDFX_PAN_CH2) {
+		setPan(3, value);
+	} else if (effectNo==SNDFX_PAN_CH3) {
+		if (sweepChanInUse) setPan(1, value);
+	} else if (effectNo==SNDFX_PAN_CH4) {
+		if (value>85) REG_SOUNDCNT_H&=~(1<<13); else REG_SOUNDCNT_H|=(1<<13);
+		if (value<43) REG_SOUNDCNT_H&=~(1<<12); else REG_SOUNDCNT_H|=(1<<12);
+	} else if (effectNo==SNDFX_PAN_CH10) {
+		setPan(4, value);
+	} else if (effectNo==SNDFX_SAMPR) {
+		REG_SOUNDBIAS=REG_SOUNDBIAS&0x3FFF|((value>>5)<<14);
+	} else if (effectNo==SNDFX_MIDICHAN) {
+		serialSetChanSet(value>>5);
 	}
 }
 
@@ -510,11 +542,14 @@ static void switchSweepChan() {
 		soundSetEffectHw(SNDFX_SWEEP_ENVELOPE, effectValueEff(SNDFX_SWEEP_ENVELOPE));
 		soundSetEffectHw(SNDFX_SWEEP_SNDLEN, effectValueEff(SNDFX_SWEEP_SNDLEN));
 		soundSetEffectHw(SNDFX_SWEEP_DUTYCYCLE, effectValueEff(SNDFX_SWEEP_DUTYCYCLE));
+		soundSetEffectHw(SNDFX_SWEEP_SPEED, effectValueEff(SNDFX_SWEEP_SPEED));
+		soundSetEffectHw(SNDFX_PAN_CH3, effectValueEff(SNDFX_PAN_CH3));
 	} else {
 		soundSetEffectHw(SNDFX_PITCH, effectValueEff(SNDFX_PITCH));
 		soundSetEffectHw(SNDFX_ENVELOPE, effectValueEff(SNDFX_ENVELOPE));
 		soundSetEffectHw(SNDFX_SNDLEN, effectValueEff(SNDFX_SNDLEN));
 		soundSetEffectHw(SNDFX_DUTYCYCLE, effectValueEff(SNDFX_DUTYCYCLE));
+		soundSetEffectHw(SNDFX_PAN_CH1, effectValueEff(SNDFX_PAN_CH1));
 		sndChanReg[0].l=(sndChanReg[0].l&0xFFF8); //disable sweep
 	}
 }
@@ -528,6 +563,7 @@ int soundGetEffectsChanged() {
 void soundSetEffect(int effectNo, int value) {
 	effectValues[effectNo]=value;
 	soundSetEffectHw(effectNo, effectValueEff(effectNo));
+	nvmemStoreCc(effectNo, value);
 	someEffectChanged=1;
 }
 

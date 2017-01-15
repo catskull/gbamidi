@@ -25,8 +25,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <avr/pgmspace.h>
 #include <avr/interrupt.h>
 #include "gbasendrom.h"
+#include "gbarom.h"
 #include "gbaserial.h"
 #include "midi.h"
+#include "bootloader/jumptable.h"
 
 void mainLoop(void)  __attribute__ ((noreturn));
 int main(void)  __attribute__ ((noreturn));
@@ -34,58 +36,152 @@ int main(void)  __attribute__ ((noreturn));
 #define GBA_SYSEX_FILL_BUFF 0
 #define GBA_SYSEX_PGM_PAGE 1
 
+//ToDo:
+// - Detect SD line, GBA gets attention by that
+// - escape midi stuff so we can put EEPROM bytes there too if needed
+// - Devise a better protocol to do that?
+// - ...
+// - Profit!
+
+/*
+
+GB Link Protocol:
+AVR->GB:
+[0-0xFD] - MIDI data
+0xFE - filler, gets ignored by GB
+0xFF - escape. Following byte:
+ 01 xx yy - stored controller value for controller xx is yy
+ 1x dd dd .. - stored 1K of data for track x
+ 0xFE - literal 0xFE
+ 0xFF - literal 0xFF
+
+GB -> AVR:
+FE - filler, gets sent when GB doesn't need anything
+01 xx yy - save value yy for controller xx
+02 xx - request value for controller xx
+1x dd dd .. dd - save 1K of data for sequencer slot x
+2x - request data for sequencer slot x
+*/
+
+#define LINK_ESCAPE 0xFF
+#define LINK_FILLER 0xFE
+#define LINK_STORE_CTR 0x1
+#define LINK_REQ_CTR 0x2
+#define LINK_STORE_TRACK 0x10
+#define LINK_REQ_TRACK 0x20
+
+#define FLASH_TRACK_OFFSET (1024*22)
+#define FLASH_TRACK_SIZE (1024)
+
+void storeSeqTrackData(int track) {
+	//If this is called, the GB will send us 1024 bytes of data. We'll need to store these into the flash memory.
+	int i, n=0;
+	char page[SPM_PAGESIZE];
+	int addr=(FLASH_TRACK_SIZE*track)+FLASH_TRACK_OFFSET; //Data will get stored from 22K to 30K in flash mem.
+	if (track<0 || track>7) return;
+	while (n<FLASH_TRACK_SIZE) {
+		for (i=0; i<SPM_PAGESIZE; i++) {
+			page[i]=gbaSerSpiTxRx(LINK_FILLER);
+		}
+		cli();
+		call_flashCopyPage(addr, page);
+		sei();
+		addr+=SPM_PAGESIZE;
+		n+=SPM_PAGESIZE;
+	}
+}
+
+
+void sendSeqTrackData(int track) {
+	int i;
+	int addr=(FLASH_TRACK_SIZE*track)+FLASH_TRACK_OFFSET; //Data will get stored from 22K to 30K in flash mem.
+	gbaSerSpiTxRx(LINK_ESCAPE);
+	gbaSerSpiTxRx(LINK_REQ_TRACK|track);
+	for (i=0; i<1024; i++) {
+		gbaSerSpiTxRx(pgm_read_byte(addr+i));
+	}
+}
+
+char actOnGbaChar(char b) {
+	unsigned char c, d;
+	if (b==LINK_STORE_CTR) {
+		unsigned int adr=0;
+		c=gbaSerSpiTxRx(LINK_FILLER);
+		d=gbaSerSpiTxRx(LINK_FILLER);
+		adr=c+(d<<8);
+		b=gbaSerSpiTxRx(LINK_FILLER);
+		eeprom_update_byte(adr+1, b); //skip the 1st byte of the eeprom, may be corrupted
+	} else if (b==LINK_REQ_CTR) {
+		unsigned int adr=0;
+		c=gbaSerSpiTxRx(LINK_FILLER);
+		d=gbaSerSpiTxRx(LINK_FILLER);
+		adr=c+(d<<8);
+		b=eeprom_read_byte(adr+1);
+		gbaSerSpiTxRx(LINK_ESCAPE);
+		gbaSerSpiTxRx(LINK_REQ_CTR);
+		gbaSerSpiTxRx(c);
+		gbaSerSpiTxRx(b);
+	} else if ((b&0xf8)==LINK_STORE_TRACK) { //store track data
+		cli();
+		storeSeqTrackData(b&0x7);
+		sei();
+	} else if ((b&0xf8)==LINK_REQ_TRACK) { //request track data
+		sendSeqTrackData(b&0x7);
+	} else {
+		//No idea. Probably a filler char.
+		return 0;
+	}
+	return 1;
+}
+
 void mainLoop(void) {
-	unsigned char c, b;
+	unsigned char b;
 	unsigned char cmd;
 	unsigned char hist[4];
 	unsigned char pgmbuff[256];
+	int c;
 	int pos;
-	while(1) {
-		c=midiGetChar();
-		gbaSerTx(c);
-		hist[0]=hist[1]; hist[1]=hist[2]; hist[2]=hist[3]; hist[3]=c;
+	int sendMoreIdleChars;
+	//Timer 0 is used to send link idle chars: if the GBA link has been idle for >10ms, a
+	//link idle byte is sent so the GBA has a chance to send data to the AVR.
+	TCCR0A=0;
+	TCCR0B=5; //20KHz timer0
+	TCNT0=0;
 
-		if (hist[0]==0xF0 && hist[1]==0x7D && hist[2]=='G' && hist[3]=='B') {
-			//Special sysex command: update GBA program
-			cmd=midiGetChar();
-			if (cmd==GBA_SYSEX_FILL_BUFF) {
-				//Fill the page buffer with some amount of nibbles.
-				pos=midiGetChar()<<4;
-				pos|=midiGetChar();
-				while (1) {
-					c=midiGetChar();
-					if (c&0x80) break;
-					b=(c<<4);
-					c=midiGetChar();
-					if (c&0x80) break;
-					b|=c;
-					pgmbuff[pos++]=b;
-				}
-			} else if (cmd==GBA_SYSEX_PGM_PAGE) {
-				//Program the page into the AVRs memory
-				pos=midiGetChar()<<4;
-				pos|=midiGetChar();
-				int ppos=0;
-				int x;
-				unsigned int w;
-				unsigned int pageaddr=(pos*256);
-				while (ppos<256) {
-					cli();
-					eeprom_busy_wait();
-					boot_page_erase(pageaddr);
-					boot_spm_busy_wait();
-					for (x=0; x<SPM_PAGESIZE; x+=2) {
-						w=pgmbuff[ppos++];
-						w|=pgmbuff[ppos++]<<8;
-						boot_page_fill(pageaddr+x, w);
-					}
-					boot_page_write(pageaddr);
-					boot_spm_busy_wait();
-					pageaddr+=SPM_PAGESIZE;
-					sei();
-				}
-				boot_rww_enable();
+#if 0
+	cli();
+	storeSeqTrackData(0);
+	storeSeqTrackData(1);
+	storeSeqTrackData(2);
+	storeSeqTrackData(3);
+	storeSeqTrackData(4);
+	storeSeqTrackData(5);
+	storeSeqTrackData(6);
+	storeSeqTrackData(7);
+	sei();
+#endif
+
+	while(1) {
+		do {
+			c=midiGetChar();
+		} while (c==-1 && TCNT0<200 && sendMoreIdleChars==0);
+		TCNT0=0;
+		if (c==-1) {
+			b=gbaSerSpiTxRx(0xFE); //send link idle char, to allow the GB to send stuff.
+		} else {
+			if (c==0xFF || c==0xFE) {
+				b=gbaSerSpiTxRx(0xFF); //escape escape/idle character
+				actOnGbaChar(b);
 			}
+			b=gbaSerSpiTxRx(c);
+		}
+		if (actOnGbaChar(b)) {
+			//If GBA wants something from us, chances are it'll want more in the future. 
+			//Send a few idle characters without delaying 10ms in between to make things go
+			//faster.
+			sendMoreIdleChars=10;
+		} else {
+			if (sendMoreIdleChars>0) sendMoreIdleChars--;
 		}
 	}
 }
@@ -94,14 +190,13 @@ void mainLoop(void) {
 int main(void) {
 	gbaSerInit();
 	_delay_ms(600); //GBA boot up delay
-	gbaSendRom(0, 1024*14);
-	_delay_ms(3000); //GBA hates to receive non-multiboot stuff while still booting.
+	gbaSendRom(gbarom_data, gbarom_size); //Send GBA payload
+
+	gbaSerSpiInit(); //Go to SPI mode for MIDI-data
+	_delay_ms(800); //GBA hates to receive non-multiboot stuff while still booting.
 
 	//Ok, GBA program oughtta be running now. Go be a midi<->gbaserial converter.
-	//Fix int vectors to boot loader range
-	MCUCR=1; MCUCR=2;
 	sei();
-	//and go!
 	midiInit();
 	mainLoop();
 }

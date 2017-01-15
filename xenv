@@ -1,0 +1,1 @@
+export PATH=/home/jeroen/c/stm32/toolchain/bin:$PATH

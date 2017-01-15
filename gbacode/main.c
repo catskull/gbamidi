@@ -21,49 +21,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "seq.h"
 #include "ui.h"
 #include "sound.h"
-
-#define RGB16(r,g,b)  ((r)+(g<<5)+(b<<10))
-
-extern int __end__;
-
-static void checkChsum() {
-	unsigned short* Screen;
-	Screen= (unsigned short*)0x6000000; 
-	unsigned int chs;
-	unsigned int *start=(unsigned int *) 0x20000E0;
-	unsigned int *end=(unsigned int *)&__end__;
-	unsigned int *p;
-	int x;
-
-	//Calculate checksum, which is basically every 32-bit word in the program
-	//added, plus the final word which gets tacked on by the bin->midi converter.
-	chs=0;
-	p=start;
-	for (p=start; p<=end; p++) {
-		chs+=*p;
-	}
-
-	if (chs!= 0) {
-		//Checksum failed! Display funky screen.
-		*(unsigned long*)0x4000000 = 0x403; // mode3, bg2 on 
-		for(x = 0; x<240*160; x++) *Screen++=x;
-		while(1);
-	}
-}
+#include "nvmem.h"
 
 int main() __attribute((noreturn));
+
 
 //Main loop
 int main() {
 	int x;
-	checkChsum();
 	interruptsInit();
 	soundInit();
-	serialInit();
-	uiInit();
 	seqInit();
+	serialInit();
+	nvmemLoadAll();
+	uiInit();
 	while(1){
-		serialTick();
+		while(serialTick());
 		soundTick();
 		uiTick();
 	}
