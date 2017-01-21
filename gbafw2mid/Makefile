@@ -1,4 +1,4 @@
-LDFLAGS=-static
+LDFLAGS=
 CCFLAGS=-fPIC
 
 gbafw2mid: main.o
