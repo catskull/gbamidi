@@ -1,7 +1,7 @@
 ARCH	:=	-mthumb -mthumb-interwork
 CFLAGS	:=	-g -Os -Wall -Wno-switch -Wno-multichar $(ARCH) $(INCLUDE) -finline-limit=10 -fno-unroll-loops -ffreestanding
 ASFLAGS	:=	-g -Wa,--warn $(ARCH)
-LDFLAGS :=  -nostdlib -T crtls/lnkscript -lgcc -static -L /home/jeroen/c/stm32/toolchain/lib/gcc/arm-none-eabi/4.5.2/
+LDFLAGS :=  -nostdlib -T crtls/lnkscript -lgcc -static -L /usr/local/gcc_arm/gcc-arm-none-eabi-6_2-2016q4/lib/gcc/arm-none-eabi/6.2.1/
 #PREFIX	:=	arm-linux-gnueabi-
 PREFIX	:=	arm-none-eabi-
 CC	:=	$(PREFIX)gcc
@@ -16,7 +16,7 @@ OBJS := main.o sound.o midinotefreq.o int.o serial.o tiles.o ui.o ccs.o seq.o gf
 
 gbamidi.gba: $(OBJS) crtls/crt0.o
 #	$(LD) crtls/crt0.o $(OBJS) -o gbamidi.elf $(LDFLAGS)
-	$(CC) -nostdlib  -Wl,-Tcrtls/lnkscript $(CFLAGS) -o gbamidi.elf crtls/crt0.o $(OBJS)  -ffreestanding -fwhole-program /home/jeroen/c/stm32/toolchain/lib/gcc/arm-none-eabi/4.5.2/libgcc.a 
+	$(CC) -nostdlib  -Wl,-Tcrtls/lnkscript $(CFLAGS) -o gbamidi.elf crtls/crt0.o $(OBJS)  -ffreestanding -fwhole-program /usr/local/gcc_arm/gcc-arm-none-eabi-6_2-2016q4/lib/gcc/arm-none-eabi/6.2.1/libgcc.a 
 	$(OBJCOPY) -O binary gbamidi.elf gbamidi.gba
 
 tiles.c: tiles.png gentiles.php
