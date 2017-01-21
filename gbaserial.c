@@ -8,9 +8,9 @@
 
 //SI, SO, SD and SC are defined from the GBAs standpoint.
 #define GBA_SC PC0
-#define GBA_SD PB1
-#define GBA_SI PB2
-#define GBA_SO PB0
+#define GBA_SD PC1
+#define GBA_SI PC2
+#define GBA_SO PC3
 
 //The char should take (F_CPU/115200) cycles. Unfortunately, that doesn't completely work, so there's a small
 //painstakenly measured value substracted...
