@@ -4,7 +4,7 @@
 # is public domain), believed to be neutral to any flavor of "make"
 # (GNU make, BSD make, SysV make)
 
-MCU = atmega328
+MCU = atmega328p
 
 FORMAT = ihex
 TARGET = gbamidi
