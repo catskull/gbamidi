@@ -32,7 +32,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 //The char should take (F_CPU/115200) cycles. Unfortunately, that doesn't completely work, so there's a small
 //painstakenly measured value substracted...
-#define CHARLEN ((F_CPU/115200)-13)
+#define CHARLEN ((F_CPU/115200)-16)
 
 static void wait(unsigned int len) {
 	while(TCNT1<=len) ;
@@ -132,33 +132,3 @@ void gbaSerInit(void) {
 }
 
 
-
-
-
-//The GB also has a SPI mode, which is a bit less timing-intensive and
-//quicker and can have the interrupts enabled. It only transmits 
-//8 bits, tho'.
-
-unsigned char gbaSerSpiTxRx(unsigned char data) {
-	unsigned char datain=0;
-	char x;
-//	while(PINB&(1<<GBA_SO)); //wait till SO is low
-	for (x=0; x<8; x++) {
-		if (data&0x80) PORTC|=(1<<GBA_SI); else PORTC&=~(1<<GBA_SI);
-		data<<=1;
-		PORTC&=~(1<<GBA_SC);
-		_delay_us(4);
-		datain<<=1;
-		if (PINC&(1<<GBA_SO)) datain|=1;
-		PORTC|=(1<<GBA_SC);
-		_delay_us(4);
-	}
-	_delay_us(40);
-	return datain;
-}
-
-void gbaSerSpiInit(void) {
-	TCCR1C=0; //timer isn't necessary anymore
-	DDRC|=(1<<GBA_SI)|(1<<GBA_SC);
-	PORTC|=(1<<GBA_SI)|(1<<GBA_SO)|(1<<GBA_SC);
-}
